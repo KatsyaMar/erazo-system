@@ -1,4 +1,21 @@
 /*VARIABLES GLOBALES Y RESETEO*/
+:root {
+
+    /* Text  */
+    --primary_text_color: #34495e;
+    --secondary_text_color: #7f8c8d;
+
+    /* Background's */
+    --body_background: #f4f7f6;
+
+    /* Buttons color */
+    --primary_button_color: #27ae60;
+    --primary_button_hover: #2ecc71;
+
+    /* Links color */
+    --link_color: #2980b9;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -7,7 +24,7 @@
 }
 
 body {
-    background-color: #f4f7f6;
+    background-color: var(--body_background);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,7 +34,7 @@ body {
 /* Contenedor principal*/
 .login-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     padding: 20px;
 }
 
@@ -30,67 +47,90 @@ body {
 }
 
 /* Textos de la tarjeta */
-.login-card h2 {
-    color: #2c3e50;
+.text-container-login {
     margin-bottom: 10px;
+
 }
 
-.login-card p {
-    color: #7f8c8d;
-    margin-bottom: 25px;
+.text-container-login h2 {
+    color: var(--primary_text_color);
 }
 
-/* =========================================
-   FORMULARIO Y CAMPOS DE TEXTO
-   ========================================= */
+.text-container-login span{
+    font-size: 28px;
+}
+
+.text-container-login p {
+    color: var(--secondary_text_color);
+    font-size: 14px;
+    margin: 8px 0;
+}
+
+/* Forms */
+
 .form-group {
     margin-bottom: 15px;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    gap: 4px;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: #34495e;
+    color: var(--primary_text_color);
     font-weight: bold;
 }
 
 .form-group input {
-    width: 100%;
     padding: 10px;
     border: 1px solid #bdc3c7;
     border-radius: 5px;
     font-size: 14px;
 }
 
-/* BOTONES Y ENLACES */
+/* Buttons*/
 .btn-primary {
     width: 100%;
     padding: 12px;
-    background-color: #27ae60;
+    background-color: var(--primary_button_color);
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: 0.3s;
     margin-top: 10px;
 }
 
 .btn-primary:hover {
-    background-color: #2ecc71;
+    background-color: var(--primary_button_hover);
 }
 
+/* Links */
 .form-links {
     margin-top: 15px;
     font-size: 14px;
 }
 
 .form-links a {
-    color: #2980b9;
+    color: var(--link_color);
     text-decoration: none;
 }
 
 .form-links a:hover {
     text-decoration: underline;
+}
+
+/* Error message */
+.error-message {
+    background-color: #ffe5e5;
+    color: #b30000;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
 }
