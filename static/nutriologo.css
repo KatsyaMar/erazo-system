@@ -1,0 +1,194 @@
+/* ── nutriologo.css ─────────────────────────────── */
+
+.layout { display: flex; height: 100vh; overflow: hidden; }
+
+/* ══ SIDEBAR ══ */
+.sidebar {
+  width: var(--sidebar-w); background: var(--green-dark);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto;
+}
+.sidebar-logo { padding: 26px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.brand-name { font-family: var(--font-display); font-size: 1.75rem; color: #fff; letter-spacing: -.5px; }
+.brand-name span { color: var(--green-soft); }
+.brand-tagline { font-size: .7rem; color: var(--green-light); margin-top: 2px; font-weight: 300; letter-spacing: .05em; }
+
+.sidebar-nav { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: var(--radius-sm);
+  color: rgba(255,255,255,.6); font-size: .9rem; font-weight: 500;
+  transition: var(--transition); cursor: pointer; text-decoration: none;
+}
+.nav-item:hover { background: rgba(255,255,255,.09); color: #fff; }
+.nav-item.active { background: rgba(82,183,136,.22); color: var(--green-soft); }
+.nav-item svg { flex-shrink: 0; width: 18px; height: 18px; }
+.nav-label { flex: 1; }
+
+.sidebar-footer { padding: 10px; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; gap: 3px; }
+.sidebar-footer .nav-item { color: rgba(255,255,255,.45); }
+
+/* ══ MAIN ══ */
+.main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; background: var(--cream); }
+
+.topbar {
+  background: var(--warm-white); padding: 14px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-left h2 { font-family: var(--font-display); font-size: 1.3rem; color: var(--green-dark); }
+.topbar-left p  { font-size: .78rem; color: var(--text-soft); }
+.user-chip {
+  display: flex; align-items: center; gap: 9px;
+  background: var(--sand); border-radius: 50px; padding: 6px 14px;
+}
+.user-chip .av { width: 30px; height: 30px; border-radius: 50%; background: var(--green-mid); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: .8rem; }
+.user-chip span { font-size: .85rem; font-weight: 600; }
+
+/* ══ PAGES ══ */
+.page-content { padding: 24px 28px; flex: 1; }
+.page-content.hidden { display: none; }
+
+/* ══ SPLIT LAYOUT (expedientes & planes) ══ */
+.split-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; min-height: 500px; }
+.split-left { overflow-y: auto; max-height: calc(100vh - 220px); }
+
+/* ══ PLAN CARDS — más espacio ══ */
+.plan-pac-card {
+  background: var(--warm-white); border-radius: var(--radius);
+  padding: 18px 20px; border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm); transition: var(--transition);
+  margin-bottom: 10px; cursor: pointer;
+}
+.plan-pac-card:hover { box-shadow: var(--shadow-md); border-color: var(--green-light); }
+.plan-pac-card.selected { border-color: var(--green-mid); background: var(--green-pale); }
+.plan-pac-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.plan-pac-body { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.plan-pac-actions { display: flex; gap: 8px; }
+
+/* ══ HORARIO ROWS in plan modal — touch-friendly ══ */
+.horario-row {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  margin-bottom: 10px; overflow: hidden; background: var(--warm-white);
+}
+.horario-row-head {
+  display: grid; grid-template-columns: 120px 1fr;
+  gap: 0; cursor: pointer;
+}
+.hor-time-col {
+  background: var(--sand); padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--border);
+}
+.hor-time-col input[type="time"] { background: transparent; border: none; font-weight: 700; font-size: .9rem; padding: 0; width: 100%; }
+.hor-time-col input[type="text"] { background: transparent; border: none; font-size: .78rem; color: var(--text-soft); padding: 0; width: 100%; }
+.hor-detail-col { padding: 12px 14px; display: flex; align-items: center; }
+.hor-detail-col .hor-preview { font-size: .8rem; color: var(--text-soft); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hor-toggle-btn { background: var(--green-pale); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: .75rem; color: var(--green-dark); flex-shrink: 0; margin-left: 8px; transition: var(--transition); }
+.horario-row.open .hor-toggle-btn { background: var(--green-mid); color: #fff; transform: rotate(180deg); }
+.hor-expand {
+  display: none; padding: 12px 14px; border-top: 1px solid var(--border); background: var(--cream);
+}
+.horario-row.open .hor-expand { display: block; }
+.hor-expand label { font-size: .78rem; color: var(--text-soft); margin-bottom: 4px; }
+.hor-expand textarea { font-size: .83rem; min-height: 72px; resize: vertical; }
+
+/* ══ CITAS — NUEVO LAYOUT ══ */
+/* La vista de citas tiene: izquierda=calendario pequeño, derecha=panel que alterna entre horarios del día y lista de citas */
+.citas-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
+
+.cal-wrap {
+  background: var(--warm-white); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); padding: 18px; border: 1px solid var(--border);
+}
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cal-nav-btn { background: var(--sand); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: var(--transition); }
+.cal-nav-btn:hover { background: var(--green-pale); }
+.cal-month-label { font-family: var(--font-display); font-size: 1rem; color: var(--green-dark); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cal-dh { font-size: .65rem; font-weight: 700; color: var(--text-soft); text-align: center; padding: 3px 0; text-transform: uppercase; }
+.cal-day {
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 6px; font-size: .8rem; font-weight: 500;
+  cursor: pointer; transition: var(--transition); position: relative;
+}
+.cal-day:not(.empty):not(.past):hover { background: var(--green-pale); }
+.cal-day.empty  { cursor: default; }
+.cal-day.past   { color: #ccc; cursor: default; }
+.cal-day.today  { background: var(--green-mid); color: #fff; }
+.cal-day.full   { background: #fdecea; color: var(--danger); }
+.cal-day.partial{ background: #fef9ec; color: var(--warning); }
+.cal-day.selected { outline: 2px solid var(--green-mid); outline-offset: 1px; }
+
+/* Leyenda del calendario */
+.cal-legend { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+.cal-legend-item { display: flex; align-items: center; gap: 7px; font-size: .7rem; color: var(--text-soft); }
+.cal-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* Panel derecho de citas — horarios o lista */
+.citas-panel { background: var(--warm-white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; }
+.citas-panel-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--sand); }
+.citas-panel-header h3 { font-family: var(--font-display); font-size: 1rem; color: var(--green-dark); }
+.citas-panel-body { padding: 16px 18px; }
+
+/* Horarios del día */
+.slot-grid { display: flex; flex-direction: column; gap: 8px; }
+.slot-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); transition: var(--transition);
+}
+.slot-item.libre { background: var(--green-pale); border-color: var(--green-light); cursor: pointer; }
+.slot-item.libre:hover { background: var(--green-light); }
+.slot-item.ocupado { background: #fdecea; border-color: #f5b7b1; }
+.slot-time { font-weight: 700; font-size: .9rem; min-width: 52px; }
+.slot-badge { font-size: .75rem; font-weight: 600; padding: 3px 10px; border-radius: 50px; }
+.slot-badge.libre   { background: var(--green-mid); color: #fff; }
+.slot-badge.ocupado { background: var(--danger); color: #fff; }
+.slot-info { flex: 1; }
+.slot-info .slot-pac  { font-weight: 600; font-size: .88rem; }
+.slot-info .slot-mot  { font-size: .78rem; color: var(--text-soft); }
+.slot-actions { display: flex; gap: 6px; }
+
+/* Lista de citas del mes */
+.cita-card {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); margin-bottom: 8px;
+  background: var(--warm-white); box-shadow: var(--shadow-sm);
+}
+.cita-date-box { min-width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--green-dark); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.cita-date-box .cd { font-size: 1.1rem; font-weight: 700; line-height: 1; }
+.cita-date-box .cm { font-size: .58rem; text-transform: uppercase; opacity: .8; }
+.cita-body { flex: 1; min-width: 0; }
+.cita-body .c-pac  { font-weight: 600; font-size: .9rem; }
+.cita-body .c-hora { font-size: .8rem; color: var(--text-soft); }
+.cita-body .c-mot  { font-size: .78rem; color: var(--text-mid); margin-top: 2px; }
+.cita-acts { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* Autocomplete paciente */
+.pac-autocomplete { position: relative; }
+.pac-dropdown {
+  display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+  background: var(--warm-white); border: 1.5px solid var(--green-soft);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-md); z-index: 200;
+  max-height: 200px; overflow-y: auto;
+}
+.pac-dropdown.open { display: block; }
+.pac-opt {
+  padding: 10px 14px; cursor: pointer; font-size: .88rem;
+  border-bottom: 1px solid var(--border); transition: var(--transition);
+}
+.pac-opt:last-child { border-bottom: none; }
+.pac-opt:hover { background: var(--green-pale); }
+.pac-opt strong { color: var(--green-dark); }
+
+@media (max-width: 960px) {
+  .citas-layout { grid-template-columns: 1fr; }
+  .split-layout  { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .sidebar { width: 60px; }
+  .brand-name, .brand-tagline, .nav-label { display: none; }
+  .nav-item { justify-content: center; padding: 12px; }
+}

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Erazo — Portal Paciente</title>
+  <link rel="stylesheet" href="../static/global.css"/>
+  <link rel="stylesheet" href="../static/paciente.css"/>
+</head>
+<body>
+<svg class="a11y-filters" xmlns="http://www.w3.org/2000/svg"><defs><filter id="deuteranopia-filter"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/></filter></defs></svg>
+
+<div class="layout">
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand-name">Era<span>zo</span></div>
+      <div class="brand-tagline">Tu portal nutricional</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" href="#" onclick="showPage('inicio',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146z"/></svg>
+        <span class="nav-label">Inicio</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('expediente',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"/><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/></svg>
+        <span class="nav-label">Mi Expediente</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('plan',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515L8.5 9.193V5.5z"/><path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07A7.001 7.001 0 0 0 8 16a7 7 0 0 0 5.29-11.584l.354-.354.353.354a.5.5 0 1 0 .707-.707l-1.414-1.415a.5.5 0 1 0-.707.707l.354.354-.354.354A6.97 6.97 0 0 0 9 2.071V1h.5a.5.5 0 0 0 0-1h-3zm1 1.5h1V2h-1v-.5zM8 3a6 6 0 1 1 0 12A6 6 0 0 1 8 3z"/></svg>
+        <span class="nav-label">Plan Alimenticio</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('citas',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>
+        <span class="nav-label">Mis Citas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="openSettings();return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.892 3.433-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/><circle cx="8" cy="8" r="2"/></svg>
+        <span class="nav-label">Configuración</span>
+      </a>
+      <!-- Cerrar sesión con diseño igual al nutriólogo -->
+      <button class="btn-logout" onclick="window.location.href='index.html'">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+        <span class="nav-label">Cerrar sesión</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+    <!-- Topbar con usuario a la derecha (color oscuro/verde) -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="tb-title">Inicio</h2>
+        <p id="tb-sub">Resumen de tu estado nutricional</p>
+      </div>
+      <!-- Chip de usuario en topbar — clic abre modal de credenciales -->
+      <div class="user-topbar-chip" onclick="openCredsModal()" title="Editar mis credenciales">
+        <div class="av">AG</div>
+        <span class="uname">Ana García</span>
+      </div>
+    </div>
+
+    <!-- ─── INICIO ─── -->
+    <div class="page-content" id="pg-inicio">
+      <div class="welcome-card">
+        <div>
+          <h2>¡Hola, Ana! 👋</h2>
+          <p>Bienvenida a tu portal de nutrición personalizada</p>
+        </div>
+        <div class="stat-row">
+          <div class="stat-box"><strong>65 kg</strong><span>Peso actual</span></div>
+          <div class="stat-box"><strong>1,800</strong><span>Kcal / día</span></div>
+          <div class="stat-box"><strong>Abr 12</strong><span>Próxima cita</span></div>
+        </div>
+      </div>
+      <div class="info-2">
+        <div class="card">
+          <p style="font-size:.72rem;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Información Personal</p>
+          <table style="width:100%;font-size:.88rem;border-collapse:collapse">
+            <tr><td style="padding:5px 0;color:var(--text-soft)">Nombre</td><td style="font-weight:500">Ana García López</td></tr>
+            <tr><td style="padding:5px 0;color:var(--text-soft)">Edad</td><td style="font-weight:500">28 años</td></tr>
+            <tr><td style="padding:5px 0;color:var(--text-soft)">Peso</td><td style="font-weight:500">65 kg</td></tr>
+            <tr><td style="padding:5px 0;color:var(--text-soft)">Estatura</td><td style="font-weight:500">1.62 m</td></tr>
+            <tr><td style="padding:5px 0;color:var(--text-soft)">IMC</td><td style="font-weight:500">24.8 — Normal</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <p style="font-size:.72rem;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Progreso Nutricional</p>
+          <div class="prog-row"><div class="prog-label"><span>Objetivo de peso</span><span>60 kg</span></div><div class="prog-track"><div class="prog-fill" style="width:62%"></div></div></div>
+          <div class="prog-row"><div class="prog-label"><span>Calorías diarias</span><span>1,800 kcal</span></div><div class="prog-track"><div class="prog-fill" style="width:80%;background:var(--green-mid)"></div></div></div>
+          <div class="prog-row"><div class="prog-label"><span>Adherencia al plan</span><span>90%</span></div><div class="prog-track"><div class="prog-fill" style="width:90%;background:var(--green-dark)"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <p style="font-size:.72rem;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px">Próxima Cita</p>
+        <div class="cita-item" style="margin-bottom:0">
+          <div class="cita-cal"><span class="day">12</span><span class="mon">Abr</span></div>
+          <div class="cita-info"><h4>Seguimiento mensual</h4><p>10:00 · Dra. Erazo</p></div>
+          <span class="badge badge-green" style="margin-left:auto;align-self:center">Confirmada</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── EXPEDIENTE ─── -->
+    <div class="page-content hidden" id="pg-expediente">
+      <h2 class="section-title">Mi Expediente Clínico</h2>
+      <p class="section-sub" style="margin-bottom:20px">Información registrada por la nutrióloga — solo lectura</p>
+      <div class="info-2">
+        <div class="card" style="background:var(--green-pale)"><p style="font-size:.72rem;font-weight:700;color:var(--green-dark);text-transform:uppercase;margin-bottom:8px">Objetivo Nutricional</p><p>Reducción de peso 5 kg en 3 meses</p></div>
+        <div class="card" style="background:var(--sand)"><p style="font-size:.72rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;margin-bottom:8px">Diagnóstico</p><p>Sobrepeso grado I</p></div>
+        <div class="card"><p style="font-size:.72rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;margin-bottom:8px">Observaciones Médicas</p><p>Paciente con buen seguimiento y disciplina.</p></div>
+        <div class="card"><p style="font-size:.72rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;margin-bottom:8px">Historial Clínico</p><p>Hipotiroidismo controlado. Sin otros antecedentes.</p></div>
+      </div>
+    </div>
+
+    <!-- ─── PLAN ─── -->
+    <div class="page-content hidden" id="pg-plan">
+      <h2 class="section-title">Mi Plan Alimenticio</h2>
+      <p class="section-sub" style="margin-bottom:20px">Plan personalizado · <em>Toca cada fila para ver el detalle de porciones</em></p>
+      <div class="info-2" style="margin-bottom:16px">
+        <div class="card" style="background:var(--green-pale)">
+          <p style="font-size:.72rem;font-weight:700;color:var(--green-dark);text-transform:uppercase;margin-bottom:4px">Calorías recomendadas</p>
+          <p style="font-size:2rem;font-weight:700;color:var(--green-dark)"><span id="plan-cal-val">—</span> <span style="font-size:1rem;font-weight:400">kcal</span></p>
+        </div>
+        <div class="card">
+          <p style="font-size:.72rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;margin-bottom:4px">Alimentos recomendados</p>
+          <p id="plan-alimentos-val" style="font-size:.88rem">—</p>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <p style="font-size:.72rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;margin-bottom:12px">Horarios de comida</p>
+        <table class="hor-table">
+          <thead><tr><th style="width:80px">Hora</th><th>Tiempo</th><th></th></tr></thead>
+          <tbody id="plan-tbody"></tbody>
+        </table>
+      </div>
+      <div class="card" style="background:var(--sand)">
+        <p style="font-size:.72rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;margin-bottom:4px">Observaciones</p>
+        <p id="plan-obs-val" style="font-size:.88rem">—</p>
+      </div>
+    </div>
+
+    <!-- ─── CITAS ─── -->
+    <div class="page-content hidden" id="pg-citas">
+      <h2 class="section-title">Mis Citas</h2>
+      <p class="section-sub" style="margin-bottom:20px">Agenda y gestiona tus consultas · Solo puedes modificar/cancelar con ≥2 días de anticipación</p>
+      <div style="display:grid;grid-template-columns:1fr 290px;gap:20px;align-items:start">
+        <div id="mis-citas-list"></div>
+        <div>
+          <p style="font-size:.72rem;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Calendario</p>
+          <div class="cal-wrap">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="changePacMonth(-1)">&#8249;</button>
+              <span class="cal-month-label" id="pac-cal-label"></span>
+              <button class="cal-nav-btn" onclick="changePacMonth(1)">&#8250;</button>
+            </div>
+            <div class="cal-grid" id="pac-cal-grid"></div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
+              <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--text-soft)"><div style="width:10px;height:10px;border-radius:3px;background:var(--green-pale)"></div>Disponible (toca para agendar)</div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--text-soft)"><div style="width:10px;height:10px;border-radius:3px;background:var(--green-mid)"></div>Hoy</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .main -->
+</div><!-- .layout -->
+
+<!-- ══ MODALES ══ -->
+
+<!-- Editar credenciales -->
+<div class="modal-overlay" id="m-creds">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><h2>Mis Credenciales</h2><button class="modal-close" onclick="closeModal('m-creds')">✕</button></div>
+    <p style="font-size:.85rem;color:var(--text-soft);margin-bottom:16px">Actualiza tu usuario (correo o teléfono) y contraseña de acceso.</p>
+    <div class="field"><label>Usuario <span class="req">*</span></label><input id="cred-modal-user" type="text" placeholder="Correo o teléfono"/></div>
+    <div class="field"><label>Contraseña <span class="req">*</span></label><input id="cred-modal-pass" type="text" placeholder="Mínimo 6 caracteres"/></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-creds')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCredentials()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Opciones de día paciente -->
+<div class="modal-overlay" id="m-pac-cal-day">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header"><h2 id="pac-day-title">Opciones del día</h2><button class="modal-close" onclick="closeModal('m-pac-cal-day')">✕</button></div>
+    <input type="hidden" id="pac-cal-date"/>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-primary w-full" onclick="openPacNuevaCita()">＋ Agendar nueva cita</button>
+      <button class="btn btn-warning w-full" id="btn-pac-mod-cita" onclick="openPacEditCita()">✏ Modificar cita</button>
+      <button class="btn btn-danger  w-full" id="btn-pac-del-cita" onclick="openPacDelCita()">🗑 Cancelar cita</button>
+      <div id="msg-no-modify" style="display:none;font-size:.82rem;color:var(--warning);background:#fef9ec;padding:10px;border-radius:6px;margin-top:4px">⚠ Solo puedes modificar o cancelar con al menos 2 días de anticipación.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Formulario cita paciente -->
+<div class="modal-overlay" id="m-pac-cita-form">
+  <div class="modal">
+    <div class="modal-header"><h2 id="pac-cita-title">Nueva Cita</h2><button class="modal-close" onclick="closeModal('m-pac-cita-form')">✕</button></div>
+    <input type="hidden" id="pac-cf-id"/>
+    <div class="form-grid-2">
+      <div class="field"><label>Fecha</label><input id="pac-cf-fecha" type="date" readonly style="background:var(--sand)"/></div>
+      <div class="field"><label>Hora disponible <span class="req">*</span></label><select id="pac-cf-hora"></select></div>
+      <div class="field span-2"><label>Motivo de consulta <span class="req">*</span></label><input id="pac-cf-motivo" type="text" placeholder="Ej. Primera consulta, seguimiento…"/></div>
+      <div class="field span-2"><label>Observaciones <span style="color:var(--text-soft)">(opcional)</span></label><textarea id="pac-cf-obs" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-pac-cita-form')">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePacCita()">Guardar cita</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmar cancelar cita -->
+<div class="modal-overlay" id="m-pac-del-cita">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><h2>Cancelar cita</h2><button class="modal-close" onclick="closeModal('m-pac-del-cita')">✕</button></div>
+    <p style="font-size:.92rem;color:var(--text-mid);margin-bottom:10px">¿Confirmas cancelar la cita del <strong id="pac-del-cita-info"></strong>?</p>
+    <div style="background:var(--danger-soft);border-radius:var(--radius-sm);padding:12px 14px;font-size:.85rem;color:var(--danger)">
+      ⚠ <strong>Aviso importante:</strong> Al cancelar la cita deberás liquidar el costo de la consulta. Comunícate con el consultorio para más información.
+    </div>
+    <input type="hidden" id="pac-del-cita-id"/>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-pac-del-cita')">Volver</button>
+      <button class="btn btn-danger" onclick="confirmPacDelCita()">Sí, cancelar cita</button>
+    </div>
+  </div>
+</div>
+
+<!-- Configuración -->
+<div class="modal-overlay" id="m-settings">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header"><h2>Configuración</h2><button class="modal-close" onclick="closeModal('m-settings')">✕</button></div>
+    <div class="settings-section">
+      <h3>Apariencia</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">Tamaño de letra</div><div class="setting-desc">Ajusta el tamaño del texto</div></div>
+        <div class="font-size-controls">
+          <button id="cfg-fs-minus">A−</button><span id="cfg-fs-val">16px</span><button id="cfg-fs-plus">A+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Tema oscuro</div><div class="setting-desc">Cambia entre claro y oscuro</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="cfg-dark"/><span class="toggle-knob"></span></label>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>Accesibilidad visual</h3>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <div><div class="setting-label">Modo de daltonismo</div><div class="setting-desc">Ajusta los colores según el tipo de daltonismo</div></div>
+        <div class="vision-options">
+          <button class="vision-btn active" data-v="normal">Normal</button>
+          <button class="vision-btn" data-v="deuteranopia">Deuteranopía</button>
+          <button class="vision-btn" data-v="protanopia">Protanopía</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('m-settings')">Cerrar</button></div>
+  </div>
+</div>
+
+<script src="../js/erazo.js"></script>
+<script src="../js/paciente.js"></script>
+<script>
+function openSettings(){ buildSettingsModal('m-settings'); openModal('m-settings'); }
+</script>
+</body>
+</html>

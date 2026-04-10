@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Erazo — Panel Nutriólogo</title>
+  <link rel="stylesheet" href="../static/global.css"/>
+  <link rel="stylesheet" href="../static/nutriologo.css"/>
+</head>
+<body>
+<svg class="a11y-filters" xmlns="http://www.w3.org/2000/svg"><defs><filter id="deuteranopia-filter"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/></filter></defs></svg>
+
+<div class="layout">
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand-name">Era<span>zo</span></div>
+      <div class="brand-tagline">Gestión Nutricional</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" href="#" onclick="showPage('pacientes',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>
+        <span class="nav-label">Gestión de Pacientes</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('expedientes',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"/><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/></svg>
+        <span class="nav-label">Expedientes</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('planes',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515L8.5 9.193V5.5z"/><path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07A7.001 7.001 0 0 0 8 16a7 7 0 0 0 5.29-11.584l.354-.354.353.354a.5.5 0 1 0 .707-.707l-1.414-1.415a.5.5 0 1 0-.707.707l.354.354-.354.354A6.97 6.97 0 0 0 9 2.071V1h.5a.5.5 0 0 0 0-1h-3zm1 1.5h1V2h-1v-.5zM8 3a6 6 0 1 1 0 12A6 6 0 0 1 8 3z"/></svg>
+        <span class="nav-label">Planes Alimenticios</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('citas',this);return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>
+        <span class="nav-label">Agendar Citas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="openSettings();return false;">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.892 3.433-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/><circle cx="8" cy="8" r="2"/></svg>
+        <span class="nav-label">Configuración</span>
+      </a>
+      <a class="nav-item" href="index.html">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+        <span class="nav-label">Cerrar sesión</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="tb-title">Gestión de Pacientes</h2>
+        <p id="tb-sub">Registra, modifica y gestiona pacientes</p>
+      </div>
+      <div class="user-chip"><div class="av">DR</div><span>Dra. Erazo</span></div>
+    </div>
+
+    <!-- ─── PACIENTES ─── -->
+    <div class="page-content" id="pg-pacientes">
+      <div class="top-bar">
+        <div><h2 class="section-title">Mis Pacientes</h2><p class="section-sub">Consulta, registra y gestiona pacientes</p></div>
+        <div class="top-bar-right">
+          <button class="btn btn-primary" onclick="openModal('m-add-pac')">＋ Agregar paciente</button>
+        </div>
+      </div>
+      <div class="search-bar" style="margin-bottom:18px;max-width:100%">
+            <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+            <input type="text" id="s-pac" placeholder="Buscar paciente…" oninput="renderPac()"/>
+          </div>
+      <div class="patient-list" id="list-pac"></div>
+    </div>
+
+    <!-- ─── EXPEDIENTES ─── -->
+    <div class="page-content hidden" id="pg-expedientes">
+      <div class="top-bar">
+        <div><h2 class="section-title">Expedientes Clínicos</h2><p class="section-sub">Crea y gestiona expedientes</p></div>
+        <button class="btn btn-primary" onclick="openNuevoExp()">＋ Nuevo expediente</button>
+      </div>
+      <div class="search-bar" style="margin-bottom:18px;max-width:100%">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+        <input type="text" id="s-exp" placeholder="Buscar expediente…" oninput="renderExp()"/>
+      </div>
+      <div class="split-layout">
+        <div class="split-left">
+          <p class="split-col-label">Pacientes con expediente</p>
+          <div class="patient-list" id="list-exp"></div>
+        </div>
+        <div>
+          <p class="split-col-label">Detalle del expediente</p>
+          <div id="exp-detail" class="card" style="color:var(--text-soft);text-align:center;padding:48px;font-size:.9rem">Selecciona un expediente de la lista</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PLANES ─── -->
+    <div class="page-content hidden" id="pg-planes">
+      <div class="top-bar">
+        <div><h2 class="section-title">Planes Alimenticios</h2><p class="section-sub">Asigna planes a pacientes con expediente</p></div>
+      </div>
+      <div class="search-bar" style="margin-bottom:18px;max-width:100%">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+        <input type="text" id="s-plan" placeholder="Buscar paciente…" oninput="renderPlanes()"/>
+      </div>
+      <div class="split-layout">
+        <div class="split-left" id="list-planes"></div>
+        <div>
+          <p class="split-col-label">Detalle del plan</p>
+          <div id="plan-detail" class="card" style="color:var(--text-soft);text-align:center;padding:48px;font-size:.9rem">Selecciona un paciente para ver su plan</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── CITAS ─── -->
+    <div class="page-content hidden" id="pg-citas">
+      <div class="top-bar">
+        <div><h2 class="section-title">Agendar Citas</h2><p class="section-sub">Selecciona un día para ver horarios disponibles</p></div>
+      </div>
+      <div class="citas-layout">
+        <!-- Calendario pequeño -->
+        <div>
+          <div class="cal-wrap">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8249;</button>
+              <span class="cal-month-label" id="cal-label"></span>
+              <button class="cal-nav-btn" onclick="changeMonth(1)">&#8250;</button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="cal-legend">
+              <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green-mid)"></div>Hoy</div>
+              <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fef9ec;border:1px solid var(--warning)"></div>Parcialmente ocupado</div>
+              <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fdecea;border:1px solid var(--danger)"></div>Totalmente ocupado</div>
+            </div>
+          </div>
+        </div>
+        <!-- Panel derecho (alterna entre horarios del día y lista de citas) -->
+        <div class="citas-panel">
+          <div class="citas-panel-header">
+            <h3 id="citas-panel-title">Citas del mes</h3>
+            <button class="btn btn-soft btn-sm" id="btn-volver-lista" style="display:none" onclick="showCitasList()">← Ver todas las citas</button>
+          </div>
+          <div class="citas-panel-body" id="citas-panel-body">
+            <p style="color:var(--text-soft);font-size:.88rem;padding:20px 0">Cargando…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .main -->
+</div><!-- .layout -->
+
+<!-- ══ MODALES ══ -->
+
+<!-- Credenciales generadas -->
+<div class="modal-overlay" id="m-cred">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><h2>Paciente registrado</h2><button class="modal-close" onclick="closeModal('m-cred')">✕</button></div>
+    <p style="font-size:.9rem;color:var(--text-mid);margin-bottom:4px">Comparte estas credenciales con el paciente.</p>
+    <div class="cred-box">
+      <p>Usuario:</p><code id="cred-user"></code>
+      <p style="margin-top:10px">Contraseña generada:</p><code id="cred-pass"></code>
+    </div>
+    <p class="hint">⚠ Guarda esta información. La contraseña no se mostrará nuevamente.</p>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('m-cred')">Entendido</button></div>
+  </div>
+</div>
+
+<!-- Agregar paciente -->
+<div class="modal-overlay" id="m-add-pac">
+  <div class="modal">
+    <div class="modal-header"><h2>Agregar Paciente</h2><button class="modal-close" onclick="closeModal('m-add-pac')">✕</button></div>
+    <div class="form-grid-2">
+      <div class="field span-2"><label>Nombre completo <span class="req">*</span></label><input id="ap-nom" type="text" placeholder="Ej. Juan Pérez López"/></div>
+      <div class="field"><label>Edad <span class="req">*</span></label><input id="ap-edad" type="number" min="1" max="120" placeholder="25"/></div>
+      <div class="field"><label>Estatura (m) <span class="req">*</span></label><input id="ap-est" type="number" step="0.01" placeholder="1.70"/></div>
+      <div class="field"><label>Peso (kg) <span class="req">*</span></label><input id="ap-peso" type="number" placeholder="70"/></div>
+      <div class="field"><label>Teléfono <span class="req">*</span></label><input id="ap-tel" type="tel" placeholder="55 1234 5678"/></div>
+      <div class="field span-2"><label>Correo <span style="color:var(--text-soft)">(opcional)</span></label><input id="ap-email" type="email" placeholder="correo@ejemplo.com"/></div>
+    </div>
+    <p class="hint">Al guardar se generará automáticamente una contraseña para el paciente.</p>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-add-pac')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addPac()">Guardar y generar contraseña</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modificar paciente -->
+<div class="modal-overlay" id="m-edit-pac">
+  <div class="modal">
+    <div class="modal-header"><h2>Modificar Paciente</h2><button class="modal-close" onclick="closeModal('m-edit-pac')">✕</button></div>
+    <input type="hidden" id="ep-id"/>
+    <div class="form-grid-2">
+      <div class="field span-2"><label>Nombre completo <span class="req">*</span></label><input id="ep-nom" type="text"/></div>
+      <div class="field"><label>Edad <span class="req">*</span></label><input id="ep-edad" type="number"/></div>
+      <div class="field"><label>Estatura (m) <span class="req">*</span></label><input id="ep-est" type="number" step="0.01"/></div>
+      <div class="field"><label>Peso (kg) <span class="req">*</span></label><input id="ep-peso" type="number"/></div>
+      <div class="field"><label>Teléfono <span class="req">*</span></label><input id="ep-tel" type="tel"/></div>
+      <div class="field span-2"><label>Correo <span style="color:var(--text-soft)">(opcional)</span></label><input id="ep-email" type="email"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-edit-pac')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditPac()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Eliminar paciente -->
+<div class="modal-overlay" id="m-del-pac">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><h2>Eliminar paciente</h2><button class="modal-close" onclick="closeModal('m-del-pac')">✕</button></div>
+    <p style="font-size:.92rem;color:var(--text-mid)">¿Confirmas eliminar a <strong id="del-pac-name"></strong>?</p>
+    <input type="hidden" id="del-pac-id"/>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-del-pac')">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmDelPac()">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nuevo expediente -->
+<div class="modal-overlay" id="m-new-exp">
+  <div class="modal">
+    <div class="modal-header"><h2>Nuevo Expediente</h2><button class="modal-close" onclick="closeModal('m-new-exp')">✕</button></div>
+    <p style="font-size:.85rem;color:var(--text-soft);margin-bottom:10px">Selecciona un paciente sin expediente:</p>
+    <div class="search-bar" style="max-width:100%;margin-bottom:12px">
+      <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+      <input type="text" id="s-noexp" placeholder="Buscar paciente…" oninput="renderNoExp()"/>
+    </div>
+    <div class="patient-list" id="list-noexp" style="max-height:180px;overflow-y:auto"></div>
+    <div class="divider"></div>
+    <div id="new-exp-form" style="display:none">
+      <p style="font-weight:600;color:var(--green-dark);margin-bottom:14px">Expediente para: <span id="new-exp-pname"></span></p>
+      <input type="hidden" id="ne-pid"/>
+      <div class="field"><label>Objetivo nutricional <span class="req">*</span></label><input id="ne-obj" type="text"/></div>
+      <div class="field"><label>Diagnóstico <span class="req">*</span></label><input id="ne-diag" type="text"/></div>
+      <div class="field"><label>Observaciones médicas <span class="req">*</span></label><textarea id="ne-obs" rows="2"></textarea></div>
+      <div class="field"><label>Historial clínico <span class="req">*</span></label><textarea id="ne-hist" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-new-exp')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save-exp" style="display:none" onclick="saveNewExp()">Guardar expediente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modificar expediente -->
+<div class="modal-overlay" id="m-edit-exp">
+  <div class="modal">
+    <div class="modal-header"><h2>Modificar Expediente</h2><button class="modal-close" onclick="closeModal('m-edit-exp')">✕</button></div>
+    <input type="hidden" id="ee-id"/>
+    <div class="field"><label>Objetivo nutricional <span class="req">*</span></label><input id="ee-obj" type="text"/></div>
+    <div class="field"><label>Diagnóstico <span class="req">*</span></label><input id="ee-diag" type="text"/></div>
+    <div class="field"><label>Observaciones</label><textarea id="ee-obs" rows="2"></textarea></div>
+    <div class="field"><label>Historial clínico</label><textarea id="ee-hist" rows="2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-edit-exp')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditExp()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Plan alimenticio -->
+<div class="modal-overlay" id="m-plan">
+  <div class="modal modal-lg">
+    <div class="modal-header"><h2 id="plan-title">Asignar Plan</h2><button class="modal-close" onclick="closeModal('m-plan')">✕</button></div>
+    <input type="hidden" id="pl-pid"/>
+    <div class="form-grid-2">
+      <div class="field span-2"><label>Calorías recomendadas por día <span class="req">*</span></label><input id="pl-cal" type="number" placeholder="Ej. 1800"/></div>
+      <div class="field span-2"><label>Alimentos que debe consumir <span class="req">*</span></label><textarea id="pl-ali" rows="2" placeholder="Ej. Pollo, avena, verduras…"></textarea></div>
+    </div>
+    <p style="font-size:.85rem;font-weight:600;color:var(--text-mid);margin-bottom:4px">Horarios de comida <span class="req">*</span></p>
+    <p class="hint" style="margin-bottom:12px">Toca cada fila para expandir y agregar el detalle de porciones y medidas exactas</p>
+    <div id="pl-horarios"></div>
+    <div class="field" style="margin-top:14px"><label>Observaciones generales <span style="color:var(--text-soft)">(opcional)</span></label><textarea id="pl-obs" rows="2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-plan')">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePlan()">Guardar plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nueva / Editar cita (modal simple con autocomplete de paciente) -->
+<div class="modal-overlay" id="m-cita-form">
+  <div class="modal">
+    <div class="modal-header"><h2>Nueva Cita</h2><button class="modal-close" onclick="closeModal('m-cita-form')">✕</button></div>
+    <input type="hidden" id="cf-id"/>
+    <input type="hidden" id="cf-fecha-hidden"/>
+    <input type="hidden" id="cf-hora-hidden"/>
+    <div style="background:var(--green-pale);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <svg fill="currentColor" width="16" height="16" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
+      <strong id="cf-fecha-txt" style="font-size:.9rem;color:var(--green-dark)">—</strong>
+    </div>
+    <div class="field">
+      <label>Paciente <span class="req">*</span></label>
+      <div class="pac-autocomplete">
+        <input type="text" id="cf-pac-input" placeholder="Escribe el nombre del paciente…" oninput="pacAutocomplete()" autocomplete="off"/>
+        <input type="hidden" id="cf-pac-id"/>
+        <div class="pac-dropdown" id="pac-dropdown"></div>
+      </div>
+    </div>
+    <div class="field"><label>Motivo de consulta <span class="req">*</span></label><input id="cf-motivo" type="text" placeholder="Ej. Seguimiento mensual"/></div>
+    <div class="field"><label>Observaciones <span style="color:var(--text-soft)">(opcional)</span></label><textarea id="cf-obs" rows="2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-cita-form')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCita()">Guardar cita</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmar eliminar cita -->
+<div class="modal-overlay" id="m-del-cita">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><h2>Eliminar cita</h2><button class="modal-close" onclick="closeModal('m-del-cita')">✕</button></div>
+    <p style="font-size:.92rem;color:var(--text-mid)">¿Confirmas eliminar la cita del <strong id="del-cita-info"></strong>?</p>
+    <input type="hidden" id="del-cita-id"/>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('m-del-cita')">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmDelCita()">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Configuración -->
+<div class="modal-overlay" id="m-settings">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header"><h2>Configuración</h2><button class="modal-close" onclick="closeModal('m-settings')">✕</button></div>
+    <div class="settings-section">
+      <h3>Apariencia</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">Tamaño de letra</div><div class="setting-desc">Ajusta el tamaño del texto</div></div>
+        <div class="font-size-controls">
+          <button id="cfg-fs-minus">A−</button><span id="cfg-fs-val">16px</span><button id="cfg-fs-plus">A+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Tema oscuro</div><div class="setting-desc">Cambia entre claro y oscuro</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="cfg-dark"/><span class="toggle-knob"></span></label>
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>Accesibilidad visual</h3>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <div><div class="setting-label">Modo de daltonismo</div><div class="setting-desc">Ajusta los colores según el tipo de daltonismo</div></div>
+        <div class="vision-options">
+          <button class="vision-btn active" data-v="normal">Normal</button>
+          <button class="vision-btn" data-v="deuteranopia">Deuteranopía</button>
+          <button class="vision-btn" data-v="protanopia">Protanopía</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('m-settings')">Cerrar</button></div>
+  </div>
+</div>
+
+<script src="../js/erazo.js"></script>
+<script src="../js/nutriologo.js"></script>
+<script>
+function openSettings(){ buildSettingsModal('m-settings'); openModal('m-settings'); }
+</script>
+</body>
+</html>

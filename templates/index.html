@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Erazo — Iniciar sesión</title>
+  <link rel="stylesheet" href="../static/global.css"/>
+  <link rel="stylesheet" href="../static/index.css"/>
+</head>
+<body>
+
+  <svg class="a11y-filters" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="deuteranopia-filter">
+        <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="panel-left">
+    <div class="brand">
+      <div class="brand-logo">Era<span>zo</span></div>
+      <p class="brand-tag">Sistema de Gestión Nutricional</p>
+    </div>
+    <div class="pill-grid">
+      <div class="pill">Pacientes</div>
+      <div class="pill">Planes</div>
+      <div class="pill">Citas</div>
+      <div class="pill">Expedientes</div>
+      <div class="pill">Reportes</div>
+      <div class="pill">Control</div>
+    </div>
+  </div>
+
+  <div class="panel-right">
+    <div class="login-box">
+      <h1 class="login-title">Bienvenido</h1>
+      <p class="login-sub">Ingresa tu usuario y contraseña para acceder al sistema</p>
+
+      <div id="err" class="err-msg"></div>
+
+      <div class="field">
+        <label>Usuario <span class="req">*</span></label>
+        <div class="inp-wrap">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 2H4a4 4 0 0 0-4 4v.5h16V14a4 4 0 0 0-4-4z"/></svg>
+          <input type="text" id="inp-user" placeholder="Correo electrónico o número de teléfono"/>
+        </div>
+        <span class="hint">Usa tu correo o número de teléfono registrado</span>
+      </div>
+
+      <div class="field">
+        <label>Contraseña <span class="req">*</span></label>
+        <div class="inp-wrap">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a4 4 0 0 0-4 4v2H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1V5a4 4 0 0 0-4-4zm3 6H5V5a3 3 0 0 1 6 0v2z"/></svg>
+          <input type="password" id="inp-pass" placeholder="Contraseña generada por el sistema"/>
+        </div>
+        <span class="hint">La contraseña es asignada por el sistema al momento de tu registro</span>
+      </div>
+
+      <button class="btn-login" onclick="doLogin()">Iniciar sesión</button>
+
+      <div class="demo-hint">
+        <strong>Credenciales de prueba</strong>
+        Nutriólogo: <code>erazo@correo.com</code> / <code>Erazo2026!</code><br/>
+        Paciente: <code>ana@erazo.com</code> / <code>ERA-1234</code>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/erazo.js"></script>
+  <script src="../js/index.js"></script>
+</body>
+</html>
