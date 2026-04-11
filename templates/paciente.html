@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Paciente - Erazo System</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/paciente.css') }}"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Mi Perfil Nutricional</h1>
+      <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar Sesión</a>
+    </header>
+
+    <div class="dashboard">
+      <input type="radio" name="ptabs" id="ptab-plan" checked />
+      <input type="radio" name="ptabs" id="ptab-citas" />
+
+      <nav class="sidebar">
+        <label for="ptab-plan" class="nav-item">Mi Plan Alimenticio</label>
+        <label for="ptab-citas" class="nav-item">Mis Citas</label>
+      </nav>
+
+      <main class="content">
+        <section id="pcontent-plan" class="tab-content">
+          <h2>Plan Alimenticio Asignado</h2>
+          <div class="info-card">
+            <p>
+              <strong>Objetivo Nutricional:</strong>
+              <span>Bajar de peso (Datos del servidor)</span>
+            </p>
+            <p>
+              <strong>Calorías:</strong>
+              <span>1800 kcal</span>
+            </p>
+            <p>
+              <strong>Horarios:</strong>
+              <span>Desayuno 8:00am, Comida 2:00pm, Cena 8:00pm</span>
+            </p>
+            <hr style="margin: 15px 0" />
+            <p><em>* El plan se presenta en formato de solo lectura.</em></p>
+            <button class="btn-pdf">Descargar Plan en PDF</button>
+          </div>
+        </section>
+
+        <section id="pcontent-citas" class="tab-content">
+          <h2>Agendar Nueva Cita</h2>
+          <form
+            action="{{ url_for('agendar_cita_paciente') }}"
+            method="POST"
+            class="grid-form"
+          >
+            <div class="form-group">
+              <label>Fecha deseada</label>
+              <input type="date" name="fecha_paciente" required />
+            </div>
+            <div class="form-group">
+              <label>Horario disponible</label>
+              <input type="time" name="hora_paciente" required />
+            </div>
+            <div class="form-group full-width">
+              <label>Motivo de la consulta</label>
+              <input type="text" name="motivo_paciente" required />
+            </div>
+            <div class="form-group full-width">
+              <button type="submit" class="btn-primary">Solicitar Cita</button>
+            </div>
+          </form>
+
+          <h2 style="margin-top: 40px">Mis Citas Programadas</h2>
+          <table class="table-citas">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>25/04/2026</td>
+                <td>10:00 AM</td>
+                <td>Activa</td>
+                <td>
+                  <form
+                    action="{{ url_for('cancelar_cita') }}"
+                    method="POST"
+                    style="display: inline"
+                  >
+                    <button type="submit" class="btn-danger">
+                      Cancelar Cita
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

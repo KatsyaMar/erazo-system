@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Erazo System - Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login.css') }}"
+    />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="text-container-login">
+          <h2>Bienvenido a</h2>
+          <h2><span>ERAZO SYSTEM</span></h2>
+          <p>Inicie sesión para continuar</p>
+        </div>
+        <form action="{{ url_for('login') }}" method="POST">
+          <div class="form-group">
+            <label for="correo">Correo electrónico *</label>
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              required
+              placeholder="ejemplo@correo.com"
+            />
+          </div>
+          <div class="form-group">
+            <label for="contrasena">Contraseña *</label>
+            <input
+              type="password"
+              id="contrasena"
+              name="contrasena"
+              required
+              placeholder="••••••••"
+            />
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Iniciar Sesión</button>
+          </div>
+          <div class="form-links">
+            <a href="#">¿Olvidaste tu contraseña?</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
