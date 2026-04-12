@@ -17,35 +17,57 @@
           <h2><span>ERAZO SYSTEM</span></h2>
           <p>Inicie sesión para continuar</p>
         </div>
-        <form action="{{ url_for('login') }}" method="POST">
+
+        <form action="{{ url_for('auth.login') }}" method="POST">
           <div class="form-group">
-            <label for="correo">Correo electrónico *</label>
+            <label>Correo Electrónico</label>
             <input
-              type="email"
-              id="correo"
+              type="text"
               name="correo"
-              required
               placeholder="ejemplo@correo.com"
+              value="{{ correo_enviado or '' }}"
             />
           </div>
+
           <div class="form-group">
-            <label for="contrasena">Contraseña *</label>
-            <input
-              type="password"
-              id="contrasena"
-              name="contrasena"
-              required
-              placeholder="••••••••"
-            />
+            <label>Contraseña</label>
+            <input type="password" name="contrasena" />
           </div>
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">Iniciar Sesión</button>
+
+          <div class="form-action">
+            <button class="btn-primary" type="submit">Iniciar Sesión</button>
           </div>
+
           <div class="form-links">
-            <a href="#">¿Olvidaste tu contraseña?</a>
+            <a href="{{ url_for('auth.solicitar_recuperacion') }}">¿Olvidaste tu contraseña?</a>
           </div>
         </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %} {% if category ==
+        'error' %}
+        <div class="error-message">{{ message }}</div>
+        {% endif %} {% endfor %} {% endif %} {% endwith %}
       </div>
     </div>
+
+    <script>
+      // Seleccionamos el cuadro del mensaje
+      const alerta = document.querySelector(".error-message");
+
+      if (alerta) {
+        // 1. Esperamos 4 segundos antes de hacer nada
+        setTimeout(() => {
+          // 2. Le damos un efecto de desvanecimiento suave con CSS
+          alerta.style.transition = "opacity 0.5s ease";
+          alerta.style.opacity = "0";
+
+          // 3. Después de que se desvanezca (0.5s), lo quitamos del diseño
+          setTimeout(() => {
+            alerta.remove();
+          }, 500);
+        }, 4000);
+      }
+    </script>
   </body>
 </html>

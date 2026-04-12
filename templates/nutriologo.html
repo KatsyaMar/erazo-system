@@ -7,12 +7,18 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/nutriologo.css') }}"
+      href="{{ url_for('static', filename='css/login.css') }}"
     />
   </head>
   <body>
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <div class="success-message">{{ messages[0] }}</div>
+    {% endif %} {% endwith %}
     <header class="topbar">
       <h1>Erazo System - Panel Nutriólogo</h1>
-      <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar Sesión</a>
+      <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+        Cerrar Sesión
+      </a>
     </header>
 
     <div class="dashboard">
@@ -33,11 +39,7 @@
       <main class="content">
         <section id="content-pacientes" class="tab-content">
           <h2>Registrar Nuevo Paciente</h2>
-          <form
-            action="{{ url_for('registro_paciente') }}"
-            method="POST"
-            class="grid-form"
-          >
+          <form action="#" method="POST" class="grid-form">
             <div class="form-group">
               <label>Teléfono (ID) *</label>
               <input type="text" name="telefono" required />
@@ -76,11 +78,7 @@
 
         <section id="content-expedientes" class="tab-content">
           <h2>Crear Expediente Clínico</h2>
-          <form
-            action="{{ url_for('crear_expediente') }}"
-            method="POST"
-            class="grid-form"
-          >
+          <form action="#" method="POST" class="grid-form">
             <div class="form-group">
               <label>Teléfono (ID) del Paciente *</label>
               <input type="text" name="telefono_exp" required />
@@ -111,11 +109,7 @@
 
         <section id="content-planes" class="tab-content">
           <h2>Asignar Plan Alimenticio</h2>
-          <form
-            action="{{ url_for('crear_plan') }}"
-            method="POST"
-            class="grid-form"
-          >
+          <form action="#" method="POST" class="grid-form">
             <div class="form-group">
               <label>Teléfono (ID) del Paciente *</label>
               <input type="text" name="telefono_plan" required />
@@ -148,11 +142,7 @@
 
         <section id="content-citas" class="tab-content">
           <h2>Programar Nueva Cita</h2>
-          <form
-            action="{{ url_for('crear_cita') }}"
-            method="POST"
-            class="grid-form"
-          >
+          <form action="#" method="POST" class="grid-form">
             <div class="form-group">
               <label>Teléfono (ID) del Paciente *</label>
               <input type="text" name="telefono_cita" required />

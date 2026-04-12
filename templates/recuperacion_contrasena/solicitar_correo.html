@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Erazo System - Recuperar Contraseña</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login.css') }}"
+    />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="text-container-login">
+          <h2>Recuperar</h2>
+          <h2><span>CONTRASEÑA</span></h2>
+          <p>Ingresa tu correo para recibir el enlace de recuperación</p>
+        </div>
+
+        <form
+          action="{{ url_for('auth.solicitar_recuperacion') }}"
+          method="POST"
+        >
+          <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input
+              type="email"
+              name="correo"
+              placeholder="ejemplo@correo.com"
+              required
+            />
+          </div>
+
+          <div class="form-action">
+            <button class="btn-primary" type="submit">Enviar enlace</button>
+          </div>
+
+          <div class="form-links">
+            <a href="{{ url_for('auth.login') }}">Volver al inicio de sesión</a>
+          </div>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="error-message {{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+      </div>
+    </div>
+
+    <script>
+      const alertas = document.querySelectorAll(".error-message");
+      alertas.forEach((alerta) => {
+        setTimeout(() => {
+          alerta.style.transition = "opacity 0.5s ease";
+          alerta.style.opacity = "0";
+          setTimeout(() => {
+            alerta.remove();
+          }, 500);
+        }, 4000);
+      });
+    </script>
+  </body>
+</html>

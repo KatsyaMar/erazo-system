@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Erazo System - Nueva Contraseña</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login.css') }}"
+    />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="text-container-login">
+          <h2>Crear nueva</h2>
+          <h2><span>CONTRASEÑA</span></h2>
+          <p>Ingresa y confirma tu nueva contraseña</p>
+        </div>
+
+        <form action="" method="POST">
+          <div class="form-group">
+            <label>Nueva Contraseña</label>
+            <input
+              type="password"
+              name="nueva_contrasena"
+              required
+              minlength="8"
+              placeholder="Mínimo 8 caracteres"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Confirmar Contraseña</label>
+            <input
+              type="password"
+              name="confirmar_contrasena"
+              required
+              placeholder="Repita la contraseña"
+            />
+          </div>
+
+          <div class="form-action">
+            <button class="btn-primary" type="submit">
+              Actualizar Contraseña
+            </button>
+          </div>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="error-message {{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+      </div>
+    </div>
+
+    <script>
+      const alertas = document.querySelectorAll(".error-message");
+      alertas.forEach((alerta) => {
+        setTimeout(() => {
+          alerta.style.transition = "opacity 0.5s ease";
+          alerta.style.opacity = "0";
+          setTimeout(() => {
+            alerta.remove();
+          }, 500);
+        }, 4000);
+      });
+    </script>
+  </body>
+</html>

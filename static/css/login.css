@@ -112,7 +112,7 @@ body {
 
 /* Links */
 .form-links {
-    margin-top: 15px;
+    margin: 15px;
     font-size: 14px;
 }
 
@@ -129,6 +129,15 @@ body {
 .error-message {
     background-color: #ffe5e5;
     color: #b30000;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.success-message {
+    background-color: #e5ffeb;
+    color: var(--primary_button_color);
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 15px;
