@@ -1,6 +1,63 @@
-# Entornos de Python
-venv/
-__pycache__/
+# =========================
+# 🔐 VARIABLES SENSIBLES
+# =========================
+.env
+.env.*
 
-# Configuraciones de VS Code
+# =========================
+# 🐍 PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# 📦 ENTORNOS VIRTUALES
+# =========================
+my_env/
+venv/
+env/
+.venv/
+
+# =========================
+# 🧪 ARCHIVOS DE SISTEMA
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# 🛠️ IDE / EDITORES
+# =========================
 .vscode/
+.idea/
+*.swp
+
+# =========================
+# 🗄️ BASE DE DATOS LOCAL
+# =========================
+*.sqlite3
+*.db
+
+# =========================
+# 📂 LOGS
+# =========================
+*.log
+
+# =========================
+# 📦 BUILD / CACHE
+# =========================
+dist/
+build/
+*.egg-info/
+
+# =========================
+# 🔥 FLASK
+# =========================
+instance/
+.webassets-cache
+
+# =========================
+# 🚫 ARCHIVOS TEMPORALES
+# =========================
+*.tmp
+*.bak

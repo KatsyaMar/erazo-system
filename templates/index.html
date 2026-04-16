@@ -1,73 +1,126 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Erazo — Iniciar sesión</title>
-  <link rel="stylesheet" href="../static/global.css"/>
-  <link rel="stylesheet" href="../static/index.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erazo System – Acceso</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body>
 
-  <svg class="a11y-filters" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <filter id="deuteranopia-filter">
-        <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/>
-      </filter>
-    </defs>
-  </svg>
+<!-- PANEL IZQUIERDO -->
+<div class="left-panel">
+  <div class="leaf-deco leaf-1">🌿</div>
+  <div class="leaf-deco leaf-2">🍃</div>
 
-  <div class="panel-left">
-    <div class="brand">
-      <div class="brand-logo">Era<span>zo</span></div>
-      <p class="brand-tag">Sistema de Gestión Nutricional</p>
+  <div class="brand-header">
+    <div class="logo-circle">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1 14.5v-5L7 14l5-8v5l4-2.5-5 8z"/></svg>
     </div>
-    <div class="pill-grid">
-      <div class="pill">Pacientes</div>
-      <div class="pill">Planes</div>
-      <div class="pill">Citas</div>
-      <div class="pill">Expedientes</div>
-      <div class="pill">Reportes</div>
-      <div class="pill">Control</div>
+    <div class="brand-name">Erazo System</div>
+    <div class="brand-tagline">Nutrición · Salud · Bienestar</div>
+  </div>
+
+  <div class="features-section">
+    <h3 class="features-title">Gestión nutricional<br>de alto nivel clínico</h3>
+    <div class="feature-item">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+      <div class="feature-text"><h4>Expedientes clínicos digitales</h4><p>Historial completo y acceso inmediato a la información de cada paciente</p></div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div class="feature-text"><h4>Planes alimenticios en PDF</h4><p>Sube y consulta planes personalizados directamente en el sistema</p></div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <div class="feature-text"><h4>Agenda de citas inteligente</h4><p>Administra tu calendario sin conflictos de horarios</p></div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+      <div class="feature-text"><h4>Seguimiento y analítica</h4><p>Monitorea el progreso de cada paciente con indicadores de salud</p></div>
     </div>
   </div>
 
-  <div class="panel-right">
-    <div class="login-box">
-      <h1 class="login-title">Bienvenido</h1>
-      <p class="login-sub">Ingresa tu usuario y contraseña para acceder al sistema</p>
-
-      <div id="err" class="err-msg"></div>
-
-      <div class="field">
-        <label>Usuario <span class="req">*</span></label>
-        <div class="inp-wrap">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 2H4a4 4 0 0 0-4 4v.5h16V14a4 4 0 0 0-4-4z"/></svg>
-          <input type="text" id="inp-user" placeholder="Correo electrónico o número de teléfono"/>
-        </div>
-        <span class="hint">Usa tu correo o número de teléfono registrado</span>
-      </div>
-
-      <div class="field">
-        <label>Contraseña <span class="req">*</span></label>
-        <div class="inp-wrap">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a4 4 0 0 0-4 4v2H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1V5a4 4 0 0 0-4-4zm3 6H5V5a3 3 0 0 1 6 0v2z"/></svg>
-          <input type="password" id="inp-pass" placeholder="Contraseña generada por el sistema"/>
-        </div>
-        <span class="hint">La contraseña es asignada por el sistema al momento de tu registro</span>
-      </div>
-
-      <button class="btn-login" onclick="doLogin()">Iniciar sesión</button>
-
-      <div class="demo-hint">
-        <strong>Credenciales de prueba</strong>
-        Nutriólogo: <code>erazo@correo.com</code> / <code>Erazo2026!</code><br/>
-        Paciente: <code>ana@erazo.com</code> / <code>ERA-1234</code>
-      </div>
+  <div class="credential-strip">
+    <div class="avatar-small">EE</div>
+    <div class="credential-info">
+      <p>Lic. Edson Erazo Espinoza</p>
+      <span>Nutriólogo Certificado · Zacatepec, Morelos</span>
     </div>
   </div>
+</div>
 
-  <script src="../js/erazo.js"></script>
-  <script src="../js/index.js"></script>
+<!-- PANEL DERECHO -->
+<div class="right-panel">
+  <div class="login-card">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for cat, msg in messages %}
+            <li class="{{ cat }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- LOGIN -->
+    <div id="loginForm" {% if mostrar_reset %}style="display:none"{% endif %}>
+      <div class="login-header">
+        <h2>Bienvenido de vuelta</h2>
+        <p>Ingresa tus credenciales para acceder al sistema</p>
+      </div>
+      <div class="alert-box alert-error"   id="errorAlert"></div>
+      <div class="alert-box alert-success" id="successAlert"></div>
+      <form id="loginFormEl" method="POST" action="{{ url_for('auth.login') }}">
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" name="correo" placeholder="correo@ejemplo.com"
+                 value="{{ correo_enviado if correo_enviado is defined else '' }}" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="contrasena" placeholder="••••••••" autocomplete="current-password" required>
+          <div class="input-hint"><a onclick="toggleRecovery()">¿Olvidaste tu contraseña?</a></div>
+        </div>
+        <button type="button" class="btn-login" onclick="handleLogin()">Iniciar sesión</button>
+      </form>
+      <div class="footer-note">Sistema exclusivo para usuarios autorizados<br><span>Erazo System</span> · v1.0</div>
+    </div>
+
+    <!-- RECUPERAR CONTRASEÑA -->
+    <div id="recoveryForm" class="recovery-form" {% if mostrar_reset %}style="display:none"{% endif %}>
+      <a class="back-link" onclick="toggleRecovery()">← Volver al inicio de sesión</a>
+      <div class="login-header">
+        <h2>Recuperar contraseña</h2>
+        <p>Te enviaremos un enlace de restablecimiento a tu correo registrado</p>
+      </div>
+      <div class="alert-box alert-error"   id="recErrorAlert"></div>
+      <div class="alert-box alert-success" id="recSuccessAlert"></div>
+      <form id="recoveryFormEl" method="POST" action="{{ url_for('auth.solicitar_recuperacion') }}">
+        <div class="form-group">
+          <label for="recEmail">Correo electrónico registrado</label>
+          <input type="email" id="recEmail" name="correo" placeholder="tu@correo.com" required>
+        </div>
+        <button type="button" class="btn-login" onclick="handleRecovery()">Enviar enlace de recuperación</button>
+      </form>
+    </div>
+
+    {% if mostrar_reset is defined and mostrar_reset %}
+    <!-- RESTABLECER CONTRASEÑA (token) -->
+    <div id="resetForm">
+      <div class="login-header"><h2>Nueva contraseña</h2><p>Elige una contraseña segura</p></div>
+      <form method="POST" action="{{ url_for('auth.restablecer_contrasena', token=token) }}">
+        <div class="form-group"><label>Nueva contraseña</label><input type="password" name="nueva_contrasena" placeholder="Mínimo 6 caracteres" required minlength="6"></div>
+        <div class="form-group"><label>Confirmar contraseña</label><input type="password" name="confirmar_contrasena" placeholder="Repite la contraseña" required minlength="6"></div>
+        <button type="submit" class="btn-login">Actualizar contraseña</button>
+      </form>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>
