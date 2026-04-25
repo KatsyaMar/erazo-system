@@ -31,6 +31,7 @@ function showSection(key) {
 function openModal(id) {
   document.getElementById(id).classList.add('show');
 }
+
 function closeModal(id) {
   document.getElementById(id).classList.remove('show');
   document.querySelectorAll(`#${id} .inline-alert`).forEach(a => {
@@ -40,6 +41,7 @@ function closeModal(id) {
   const imc = document.getElementById('imcDisplay');
   if (imc) imc.textContent = '—';
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
@@ -274,6 +276,18 @@ function guardarModificacion() {
       alertEl.textContent = 'Error al modificar el paciente.';
     });
 }
+
+setTimeout(() => {
+  document.querySelectorAll('.flash-messages li').forEach(el => {
+    el.style.transition = 'opacity 0.4s ease';
+    
+    setTimeout(() => {
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 400);
+    }, 3000);
+  });
+}, 200);
+
 
 /* ===== EXPEDIENTES ===== */
 function loadExpedientesList() {
