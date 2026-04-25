@@ -97,7 +97,16 @@ def dashboard_paciente():
 
 app.register_blueprint(main_bp)
 
-
+# --- MANEJO DE RUTAS NO EXISTENTES (REDIRECCIÓN POR ROL) ---
+@app.errorhandler(404)
+def pagina_no_encontrada(e):
+    if current_user.is_authenticated:
+        if current_user.rol == 'NUTRIOLOGO':
+            return redirect(url_for('main.dashboard_nutriologo'))
+        elif current_user.rol == 'PACIENTE':
+            return redirect(url_for('main.dashboard_paciente'))
+    
+    return redirect(url_for('auth.login'))
 # ─────────────────────────────────────────────────
 # Run
 # ─────────────────────────────────────────────────
