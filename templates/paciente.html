@@ -181,7 +181,8 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='../js/paciente.js') }}"></script>
+<!-- ✅ CORRECCIÓN: ruta del JS arreglada (se eliminó el ../) -->
+<script src="{{ url_for('static', filename='js/paciente.js') }}"></script>
 <script>
 // Cargar datos del héro al iniciar
 document.addEventListener('DOMContentLoaded', () => {
@@ -196,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(r => r.json())
     .then(d => {
       if (d.cita) {
-        const f = new Date(d.cita.fecha_cita);
+        const [fy,fm,fd] = d.cita.fecha_cita.split("-").map(Number); const f = new Date(fy, fm-1, fd);
         const m = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
         document.getElementById('statCitas').textContent = `${f.getDate()} ${m[f.getMonth()]}`;
       } else {

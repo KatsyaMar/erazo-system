@@ -1,3 +1,9 @@
+// Helper: parsea fecha YYYY-MM-DD sin conversión de timezone
+function parseFecha(str) {
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 // =============================================
 // ERAZO SYSTEM — paciente.js
 // =============================================
@@ -94,7 +100,7 @@ function loadCitas() {
         return;
       }
       list.innerHTML = citas.map(c => {
-        const fecha  = new Date(c.fecha_cita);
+        const fecha  = parseFecha(c.fecha_cita);
         const dia    = fecha.getDate();
         const meses  = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
         const mes    = meses[fecha.getMonth()];
@@ -123,7 +129,7 @@ function loadProximaCita() {
       if (!el) return;
       if (data.cita) {
         const c = data.cita;
-        const fecha = new Date(c.fecha_cita);
+        const fecha = parseFecha(c.fecha_cita);
         const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
         el.innerHTML = `
           <div style="text-align:center;">
@@ -249,7 +255,7 @@ function guardarCita() {
 /* ===== CANCELAR CITA ===== */
 function solicitarCancelacion(id, fecha) {
   const hoy = new Date();
-  const fCita = new Date(fecha);
+  const fCita = parseFecha(fecha);
   const diff = (fCita - hoy) / (1000 * 60 * 60);
   document.getElementById('cancelCitaId').value = id;
   if (diff < 48) {
