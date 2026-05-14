@@ -13,6 +13,9 @@ from PYTHON.routes.auth import auth_bp
 from PYTHON.modulos.citas.citas import citas_bp
 from PYTHON.modulos.pacientes.pacientes import pacientes_bp 
 
+#planes
+from PYTHON.routes.planes import planes_bp 
+
 
 #=============================================================================================================================================
 
@@ -56,6 +59,10 @@ def index():
 app.register_blueprint(auth_bp)
 app.register_blueprint(pacientes_bp)  # ← AGREGADO
 app.register_blueprint(citas_bp)      # ← AGREGADO
+
+
+
+app.register_blueprint(planes_bp) # planes
 
 # Rutas de dashboard
 

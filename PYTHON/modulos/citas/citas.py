@@ -392,31 +392,3 @@ def disponibilidad():
     cursor.close(); conn.close()
     return jsonify({'ocupadas': [formato_hora(r['hora']) if r.get('hora') else r['hora'] for r in rows]})
 
-
-# GET /api/mi-plan  — plan alimenticio del paciente
-@citas_bp.route('/api/mi-plan', methods=['GET'])
-@login_required
-def mi_plan():
-    if current_user.rol != 'PACIENTE':
-        return jsonify({'error': 'Acceso no autorizado'}), 403
-
-    conn   = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    try:
-        cursor.execute("""
-            SELECT e.nombre_plan, e.pdf_url
-            FROM expedientes e
-            JOIN pacientes p ON e.id_paciente = p.id_paciente
-            WHERE p.id_usuario = %s AND e.estado = 'ACTIVO'
-            ORDER BY e.fecha_creacion DESC LIMIT 1
-        """, (current_user.id,))
-        exp = cursor.fetchone()
-        cursor.close(); conn.close()
-
-        if exp and exp.get('pdf_url'):
-            return jsonify({'tiene_plan': True, 'nombre_plan': exp.get('nombre_plan', 'Plan alimenticio'), 'pdf_url': exp['pdf_url']})
-        return jsonify({'tiene_plan': False})
-    except Exception:
-        cursor.close(); conn.close()
-        return jsonify({'tiene_plan': False})

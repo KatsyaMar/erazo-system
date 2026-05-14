@@ -404,6 +404,7 @@ function selectPlanPaciente(id, nombre, el) {
   document.querySelectorAll('.patient-list-item').forEach(x => x.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('planPacienteNombre').textContent = nombre;
+  
   fetch(`/api/planes/${id}`)
     .then(r => r.json())
     .then(plan => {
@@ -423,16 +424,27 @@ function selectPlanPaciente(id, nombre, el) {
       } else {
         panel.innerHTML = `
           <div class="pdf-drop-zone" id="dropZone" onclick="triggerPlanUpload()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.6;">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
             <p>Arrastra el PDF aquí o <span>selecciona el archivo</span></p>
             <p style="font-size:0.72rem;margin-top:0.5rem;">Solo archivos .pdf</p>
           </div>
           <input type="file" id="planPdfInput" accept=".pdf" style="display:none" onchange="uploadPlanPDF(this.files[0])">`;
       }
+    })
+    .catch(() => {
+      document.getElementById('planViewPanel').innerHTML = `<div style="padding:1.5rem;color:var(--t-cla);font-size:0.83rem;">No se pudo cargar el plan.</div>`;
     });
 }
 
-function triggerPlanUpload() { document.getElementById('planPdfInput').click(); }
+function triggerPlanUpload() {
+  document.getElementById('planPdfInput').click();
+}
+
 function handleDragOver(e)  { e.preventDefault(); document.getElementById('dropZone')?.classList.add('dragover'); }
 function handleDragLeave(e) { document.getElementById('dropZone')?.classList.remove('dragover'); }
 function handleDrop(e) {
@@ -442,18 +454,24 @@ function handleDrop(e) {
   if (file && file.type === 'application/pdf') uploadPlanPDF(file);
   else showToast('Solo se permiten archivos PDF', 'error');
 }
+
 function uploadPlanPDF(file) {
   if (!selectedPlanUserId) return;
   if (!file || file.type !== 'application/pdf') { showToast('Solo se permiten archivos PDF', 'error'); return; }
   const form = new FormData();
   form.append('pdf', file);
   form.append('id_usuario', selectedPlanUserId);
+  
   fetch('/api/planes/upload', { method: 'POST', body: form })
     .then(r => r.json())
     .then(data => {
       if (data.error) showToast(data.error, 'error');
-      else { showToast('Plan alimenticio subido correctamente'); selectPlanPaciente(selectedPlanUserId, document.getElementById('planPacienteNombre').textContent, document.querySelector('.patient-list-item.selected')); }
-    });
+      else { 
+        showToast('Plan alimenticio subido correctamente'); 
+        selectPlanPaciente(selectedPlanUserId, document.getElementById('planPacienteNombre').textContent, document.querySelector('.patient-list-item.selected')); 
+      }
+    })
+    .catch(() => showToast('Error al subir el plan', 'error'));
 }
 
 /* ===== CITAS — BUSCADOR AGENDA ===== */

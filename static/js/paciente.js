@@ -41,8 +41,14 @@ function loadPlan() {
     .then(r => r.json())
     .then(data => {
       const body = document.getElementById('planContent');
+      const cajitaPlan = document.getElementById('statPlan'); // Buscamos la tarjeta de arriba
+
       if (!body) return;
+
       if (data.tiene_plan && data.pdf_url) {
+        // Si hay plan, cambiamos el texto a "Activo"
+        if (cajitaPlan) cajitaPlan.textContent = 'Activo';
+
         body.innerHTML = `
           <div class="pdf-container">
             <div class="pdf-toolbar">
@@ -55,6 +61,9 @@ function loadPlan() {
             <iframe src="${data.pdf_url}" title="Mi plan alimenticio"></iframe>
           </div>`;
       } else {
+        // Si no hay plan, aseguramos que diga "Sin plan"
+        if (cajitaPlan) cajitaPlan.textContent = 'Sin plan';
+
         body.innerHTML = `
           <div class="no-plan-state">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -73,8 +82,13 @@ function loadPlanResumen() {
     .then(r => r.json())
     .then(data => {
       const el = document.getElementById('quickPlanResumen');
+      const cajitaPlan = document.getElementById('statPlan'); 
+      
       if (!el) return;
+
       if (data.tiene_plan) {
+        if (cajitaPlan) cajitaPlan.textContent = 'Activo'; // Actualiza desde el resumen
+
         el.innerHTML = `
           <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid #f2f0ea;">
             <div style="width:8px;height:8px;border-radius:50%;background:var(--teal)"></div>
@@ -83,10 +97,18 @@ function loadPlanResumen() {
           </div>
           <p style="font-size:0.75rem;color:var(--t-cla);margin-top:0.75rem;">Revisa la pestaña "Mi Plan" para ver el detalle completo.</p>`;
       } else {
+        if (cajitaPlan) cajitaPlan.textContent = 'Sin plan'; // Actualiza desde el resumen
+
         el.innerHTML = `<p style="font-size:0.82rem;color:var(--t-cla);">Tu nutriólogo aún no ha subido tu plan alimenticio.</p>`;
       }
     });
 }
+
+/* Cargar estado del plan desde que se entra a la pagina*/
+document.addEventListener('DOMContentLoaded', () => {
+    loadPlan();
+    loadPlanResumen();
+});
 
 /* ===== CITAS ===== */
 function loadCitas() {
