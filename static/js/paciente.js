@@ -18,6 +18,7 @@ function showView(key, btn) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (key === 'plan')   loadPlan();
   if (key === 'citas')  loadCitas();
+  if (key === 'expediente') cargarExpediente();
 }
 
 /* ===== MODALES ===== */
@@ -307,4 +308,153 @@ function showToast(msg, type = 'success') {
   t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3200);
+}
+
+/* ========= Cargar plan desde paciente ========*/
+document.addEventListener('DOMContentLoaded', () => {
+    cargarExpediente();
+});
+
+function cargarExpediente() {
+  fetch('/api/paciente/expediente')
+    .then(r => r.json())
+    .then(data => {
+      const cont = document.getElementById('expedienteContent');
+
+      if (data.error) {
+        cont.innerHTML = `
+          <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 1rem; border-radius: 8px; color: #991b1b;">
+            ⚠️ ${data.error}
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = `
+        <style>
+          .expediente-modern {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 100%;
+          }
+          .metric-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+          }
+          .metric-card {
+            background: linear-gradient(135deg, #007576 0%, #2F4858 100%);
+            border-radius: 20px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+          }
+          .metric-card:hover {
+            transform: translateY(-3px);
+          }
+          .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.2;
+          }
+          .metric-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+            letter-spacing: 0.5px;
+          }
+          .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 1.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+          }
+          .info-row {
+            display: flex;
+            background: #f9fafb;
+            border-radius: 16px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            transition: all 0.2s;
+          }
+          .info-label {
+            width: 180px;
+            background: #f3f4f6;
+            padding: 1rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+            border-right: 1px solid #e5e7eb;
+          }
+          .info-content {
+            flex: 1;
+            padding: 1rem;
+            color: #111827;
+            background: white;
+            word-break: break-word;
+          }
+          .empty-message {
+            color: #9ca3af;
+            font-style: italic;
+          }
+          @media (max-width: 640px) {
+            .info-row {
+              flex-direction: column;
+            }
+            .info-label {
+              width: 100%;
+              border-right: none;
+              border-bottom: 1px solid #e5e7eb;
+            }
+            .metric-value {
+              font-size: 1.5rem;
+            }
+          }
+        </style>
+
+        <div class="expediente-modern">
+          <!-- Tarjetas de métricas principales -->
+          <div class="metric-grid-modern">
+            <div class="metric-card">
+              <div class="metric-value">${parseFloat(data.peso).toFixed(1)} kg</div>
+              <div class="metric-label">Peso actual</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">${parseFloat(data.estatura).toFixed(2)} m</div>
+              <div class="metric-label">Estatura</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">${parseFloat(data.imc).toFixed(1)}</div>
+              <div class="metric-label">Índice de Masa Corporal</div>
+            </div>
+          </div>
+
+          <!-- Información detallada -->
+          <div class="section-title">📋 Información clínica</div>
+          
+          ${renderField('🎯 Objetivo Nutricional', data.objetivo_nutricional)}
+          ${renderField('🩺 Diagnóstico Inicial', data.diagnostico_inicial)}
+          ${renderField('📝 Observaciones Médicas', data.observaciones_medicas)}
+          ${renderField('📚 Historial Clínico', data.historial_clinico)}
+          ${renderField('✨ Nuevas Observaciones', data.nuevas_observaciones || 'Sin observaciones')}
+        </div>
+      `;
+    });
+}
+
+// Función auxiliar para renderizar cada campo
+function renderField(label, content) {
+  const hasContent = content && content.trim() !== '' && content !== 'Sin observaciones';
+  return `
+    <div class="info-row">
+      <div class="info-label">${label}</div>
+      <div class="info-content ${!hasContent ? 'empty-message' : ''}">
+        ${hasContent ? content.replace(/\n/g, '<br>') : '— Sin información registrada —'}
+      </div>
+    </div>
+  `;
 }

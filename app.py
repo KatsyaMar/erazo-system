@@ -16,6 +16,9 @@ from PYTHON.modulos.pacientes.pacientes import pacientes_bp
 #planes
 from PYTHON.routes.planes import planes_bp 
 
+#expedientes
+from PYTHON.routes.expedientes import expedientes_bp
+
 
 #=============================================================================================================================================
 
@@ -59,6 +62,7 @@ def index():
 app.register_blueprint(auth_bp)
 app.register_blueprint(pacientes_bp)  # ← AGREGADO
 app.register_blueprint(citas_bp)      # ← AGREGADO
+app.register_blueprint(expedientes_bp)
 
 
 
@@ -115,6 +119,8 @@ def register():
     return render_template('register.html')
 
 # DE AQUI PARA ARRIBA SE VA A BORRAR EN PRODUCCION
+
+
 
 
 # Redirigimos al index por si el usuario es Cesar (usted no profe, el de mi equipo) y escribió la URL mal xd

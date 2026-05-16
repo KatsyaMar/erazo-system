@@ -339,8 +339,8 @@ function guardarExpediente() {
     });
 }
 
-function modificarExpediente(idUsuario) {
-  document.getElementById('modExpUsuarioId').value = idUsuario;
+function modificarExpediente(idExpediente) {
+  document.getElementById('modExpUsuarioId').value = idExpediente;
   openModal('modalModificarExp');
 }
 function guardarModificacionExp() {
