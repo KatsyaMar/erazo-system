@@ -11,7 +11,7 @@ const SECTION_META = {
   configuracion: { title: 'Configuración',                desc: 'Ajusta las preferencias del sistema' },
 };
 
-function showSection(key) {
+function showSection(key, btn) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const sec = document.getElementById('sec-' + key);
@@ -21,62 +21,32 @@ function showSection(key) {
     document.getElementById('sectionTitle').textContent = meta.title;
     document.getElementById('sectionDesc').textContent  = meta.desc;
   }
-  if (event && event.currentTarget) event.currentTarget.classList.add('active');
-  if (key === 'citas') renderCalendar();
+  if (btn) btn.classList.add('active');
+  else if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  if (key === 'citas')       renderCalendar();
   if (key === 'expedientes') loadExpedientesList();
-  if (key === 'planes') loadPlanesList();
+  if (key === 'planes')      loadPlanesList();
 }
 
 /* ===== MODALES ===== */
 function openModal(id) {
   document.getElementById(id).classList.add('show');
 }
-
 function closeModal(id) {
   document.getElementById(id).classList.remove('show');
-
-  // Limpiar alertas inline
   document.querySelectorAll(`#${id} .inline-alert`).forEach(a => {
     a.className = 'inline-alert';
     a.textContent = '';
   });
-
-  // ── FIX 1: limpiar TODOS los inputs/textareas/selects del modal al cerrarlo ──
-  // Esto evita que al abrir el modal de nuevo aparezcan datos del registro anterior
-  document.querySelectorAll(`#${id} input:not([type="hidden"]), #${id} textarea, #${id} select`).forEach(el => {
-    el.value = '';
-  });
-
-  // Resetear displays de IMC
-  const imcN = document.getElementById('imcDisplay');
-  if (imcN) imcN.textContent = '—';
-  const imcM = document.getElementById('mImcDisplay');
-  if (imcM) imcM.textContent = '—';
+  const imc = document.getElementById('imcDisplay');
+  if (imc) imc.textContent = '—';
 }
-
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
   });
   renderPatients();
-
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      const secPacientes = document.getElementById('sec-pacientes');
-      if (secPacientes && secPacientes.classList.contains('active')) {
-        renderPatients();
-      }
-    }
-  });
 });
-
-/* ===== FIX 2: VALIDACIÓN DE CORREO ===== */
-// Regex reutilizada en registro y en modificación
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validarCorreo(correo) {
-  return EMAIL_REGEX.test(correo);
-}
 
 /* ===== IMC ===== */
 function calcIMC() {
@@ -88,9 +58,7 @@ function calcIMC() {
     const v = (peso / (est * est)).toFixed(1);
     const cat = v < 18.5 ? 'Bajo peso' : v < 25 ? 'Normal' : v < 30 ? 'Sobrepeso' : 'Obesidad';
     el.textContent = `${v} – ${cat}`;
-  } else {
-    el.textContent = '—';
-  }
+  } else { el.textContent = '—'; }
 }
 
 /* ===== PACIENTES — Filtros ===== */
@@ -108,7 +76,7 @@ function filterPatients(val) {
   renderPatients();
 }
 
-/* ===== RENDER PACIENTES (fetch desde Flask) ===== */
+/* ===== RENDER PACIENTES ===== */
 function renderPatients() {
   fetch(`/api/pacientes?estado=${filtroEstado}&q=${encodeURIComponent(filtroTexto)}`)
     .then(r => r.json())
@@ -125,9 +93,9 @@ function renderPatients() {
         const acciones = activo
           ? `<button class="act-btn teal" onclick="consultarPaciente(${p.id_usuario})">Consultar</button>
              <button class="act-btn"     onclick="modificarPaciente(${p.id_usuario})">Modificar</button>
-             <button class="act-btn red" onclick="darBajaPaciente(${p.id_usuario}, '${p.nombre_completo}')">Dar de baja</button>`
+             <button class="act-btn red" onclick="darBajaPaciente(${p.id_usuario}, '${p.nombre_completo.replace(/'/g,"\\'")}')">Dar de baja</button>`
           : `<button class="act-btn teal"  onclick="consultarPaciente(${p.id_usuario})">Consultar</button>
-             <button class="act-btn green" onclick="darAltaPaciente(${p.id_usuario}, '${p.nombre_completo}')">Dar de alta</button>`;
+             <button class="act-btn green" onclick="darAltaPaciente(${p.id_usuario}, '${p.nombre_completo.replace(/'/g,"\\'")}')">Dar de alta</button>`;
         return `<tr>
           <td><div class="patient-name">
             <div class="p-avatar">${initials}</div>
@@ -167,17 +135,17 @@ function consultarPaciente(id) {
     .catch(() => showToast('Error al obtener datos del paciente', 'error'));
 }
 
-/* ===== MODIFICAR PACIENTE — cargar datos ===== */
+/* ===== MODIFICAR PACIENTE ===== */
 function modificarPaciente(id) {
   fetch(`/api/pacientes/${id}`)
     .then(r => r.json())
     .then(p => {
-      document.getElementById('mPacienteId').value    = p.id_usuario;
-      document.getElementById('mNombre').value        = p.nombre_completo;
-      document.getElementById('mCorreo').value        = p.correo;
-      document.getElementById('mEdad').value          = p.edad;
-      document.getElementById('mPeso').value          = p.peso;
-      document.getElementById('mEstatura').value      = p.estatura;
+      document.getElementById('mPacienteId').value = p.id_usuario;
+      document.getElementById('mNombre').value     = p.nombre_completo;
+      document.getElementById('mCorreo').value     = p.correo;
+      document.getElementById('mEdad').value       = p.edad;
+      document.getElementById('mPeso').value       = p.peso;
+      document.getElementById('mEstatura').value   = p.estatura;
       calcIMCModificar();
       openModal('modalModificarPaciente');
     })
@@ -193,26 +161,33 @@ function calcIMCModificar() {
     const v = (peso / (est * est)).toFixed(1);
     const cat = v < 18.5 ? 'Bajo peso' : v < 25 ? 'Normal' : v < 30 ? 'Sobrepeso' : 'Obesidad';
     el.textContent = `${v} – ${cat}`;
-  } else {
-    el.textContent = '—';
-  }
+  } else { el.textContent = '—'; }
 }
 
 /* ===== DAR DE BAJA ===== */
 function darBajaPaciente(id, nombre) {
-  document.getElementById('bajaPacienteId').value    = id;
+  document.getElementById('bajaPacienteId').value = id;
   document.getElementById('bajaPacienteNombre').textContent = nombre;
   openModal('modalDarBaja');
 }
 
 function confirmarBaja() {
   const id = document.getElementById('bajaPacienteId').value;
-  fetch(`/api/pacientes/${id}/baja`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+  if (!id) { showToast('Error: no se identificó al paciente', 'error'); return; }
+
+  fetch(`/api/pacientes/${id}/baja`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  })
     .then(r => r.json())
     .then(data => {
-      closeModal('modalDarBaja');
-      showToast(data.message || 'Paciente dado de baja correctamente');
-      renderPatients();
+      if (data.error) {
+        showToast(data.error, 'error');
+      } else {
+        closeModal('modalDarBaja');
+        showToast(data.message || 'Paciente dado de baja correctamente');
+        renderPatients();
+      }
     })
     .catch(() => showToast('Error al dar de baja al paciente', 'error'));
 }
@@ -220,11 +195,18 @@ function confirmarBaja() {
 /* ===== DAR DE ALTA ===== */
 function darAltaPaciente(id, nombre) {
   if (!confirm(`¿Dar de alta a ${nombre}?`)) return;
-  fetch(`/api/pacientes/${id}/alta`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+  fetch(`/api/pacientes/${id}/alta`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  })
     .then(r => r.json())
     .then(data => {
-      showToast(data.message || 'Paciente dado de alta correctamente');
-      renderPatients();
+      if (data.error) {
+        showToast(data.error, 'error');
+      } else {
+        showToast(data.message || 'Paciente dado de alta correctamente');
+        renderPatients();
+      }
     })
     .catch(() => showToast('Error al dar de alta al paciente', 'error'));
 }
@@ -239,50 +221,22 @@ function guardarPaciente() {
   const peso     = document.getElementById('pPeso').value;
   const estatura = document.getElementById('pEstatura').value;
   const alertEl  = document.getElementById('alertPaciente');
-
-  // Validar campos vacíos
   if (!nombre || !tel || !correo || !pass || !edad || !peso || !estatura) {
     alertEl.className = 'inline-alert error show';
     alertEl.textContent = 'Datos incompletos, favor de llenar todos los campos.';
     return;
   }
-
-  // ── FIX 2: Validar formato de correo antes de llamar al servidor ──
-  if (!validarCorreo(correo)) {
-    alertEl.className = 'inline-alert error show';
-    alertEl.textContent = 'El correo electrónico no es válido. Debe tener el formato: ejemplo@dominio.com';
-    return;
-  }
-
   fetch('/api/pacientes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      nombre_completo: nombre,
-      telefono: tel,
-      correo,
-      contrasena: pass,
-      edad: parseInt(edad),
-      peso: parseFloat(peso),
-      estatura: parseFloat(estatura)
-    })
+    body: JSON.stringify({ nombre_completo: nombre, telefono: tel, correo, contrasena: pass, edad: parseInt(edad), peso: parseFloat(peso), estatura: parseFloat(estatura) })
   })
     .then(r => r.json())
     .then(data => {
-      if (data.error) {
-        alertEl.className = 'inline-alert error show';
-        // ── FIX 3: mensaje específico según el campo duplicado ──
-        alertEl.textContent = _mensajeErrorRegistro(data.error, tel, correo);
-      } else {
-        closeModal('modalNuevoPaciente');
-        renderPatients();
-        showToast('Paciente registrado correctamente');
-      }
+      if (data.error) { alertEl.className = 'inline-alert error show'; alertEl.textContent = data.error; }
+      else { closeModal('modalNuevoPaciente'); renderPatients(); showToast('Paciente registrado correctamente'); }
     })
-    .catch(() => {
-      alertEl.className = 'inline-alert error show';
-      alertEl.textContent = 'No se pudo conectar con el servidor. Intente de nuevo.';
-    });
+    .catch(() => { alertEl.className = 'inline-alert error show'; alertEl.textContent = 'Error al registrar el paciente.'; });
 }
 
 /* ===== GUARDAR MODIFICACIÓN PACIENTE ===== */
@@ -294,107 +248,23 @@ function guardarModificacion() {
   const peso     = document.getElementById('mPeso').value;
   const estatura = document.getElementById('mEstatura').value;
   const alertEl  = document.getElementById('alertModificar');
-
   if (!nombre || !correo) {
     alertEl.className = 'inline-alert error show';
     alertEl.textContent = 'El nombre y correo son obligatorios.';
     return;
   }
-
-  // ── FIX 2: Validar formato de correo también en modificación ──
-  if (!validarCorreo(correo)) {
-    alertEl.className = 'inline-alert error show';
-    alertEl.textContent = 'El correo electrónico no es válido. Debe tener el formato: ejemplo@dominio.com';
-    return;
-  }
-
   fetch(`/api/pacientes/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      nombre_completo: nombre,
-      correo,
-      edad: parseInt(edad),
-      peso: parseFloat(peso),
-      estatura: parseFloat(estatura)
-    })
+    body: JSON.stringify({ nombre_completo: nombre, correo, edad: parseInt(edad), peso: parseFloat(peso), estatura: parseFloat(estatura) })
   })
     .then(r => r.json())
     .then(data => {
-      if (data.error) {
-        alertEl.className = 'inline-alert error show';
-        // ── FIX 3: mensaje específico para correo duplicado en modificación ──
-        alertEl.textContent = _mensajeErrorModificacion(data.error, correo);
-      } else {
-        closeModal('modalModificarPaciente');
-        renderPatients();
-        showToast('Paciente actualizado correctamente');
-      }
+      if (data.error) { alertEl.className = 'inline-alert error show'; alertEl.textContent = data.error; }
+      else { closeModal('modalModificarPaciente'); renderPatients(); showToast('Paciente actualizado correctamente'); }
     })
-    .catch(() => {
-      alertEl.className = 'inline-alert error show';
-      alertEl.textContent = 'No se pudo conectar con el servidor. Intente de nuevo.';
-    });
+    .catch(() => { alertEl.className = 'inline-alert error show'; alertEl.textContent = 'Error al modificar el paciente.'; });
 }
-
-/* ===== HELPERS — Mensajes de error específicos ===== */
-
-/**
- * Interpreta el error del servidor al REGISTRAR un paciente
- * y devuelve un mensaje claro indicando el campo duplicado.
- */
-function _mensajeErrorRegistro(errorMsg, tel, correo) {
-  const msg = errorMsg.toLowerCase();
-
-  // MySQL lanza "Duplicate entry 'valor' for key 'nombre_columna'"
-  // El backend puede reenviar ese mensaje o uno propio
-  if (msg.includes('duplicate entry') || msg.includes('ya se encuentra registrado') || msg.includes('ya está registrado')) {
-    // Intentar detectar cuál campo es
-    if (msg.includes('telefono') || msg.includes(tel.toLowerCase())) {
-      return `El teléfono "${tel}" ya está registrado por otro paciente.`;
-    }
-    if (msg.includes('correo') || msg.includes('email') || msg.includes(correo.toLowerCase())) {
-      return `El correo "${correo}" ya está registrado por otro paciente.`;
-    }
-    // Si el backend no especifica cuál campo, indicar ambos
-    return `Ya existe un paciente con ese teléfono o correo electrónico. Verifica los datos e intenta de nuevo.`;
-  }
-
-  if (msg.includes('incompletos') || msg.includes('llenar todos')) {
-    return errorMsg;
-  }
-
-  // Devolver el mensaje original si no encaja en ningún caso
-  return errorMsg;
-}
-
-/**
- * Interpreta el error del servidor al MODIFICAR un paciente
- * y devuelve un mensaje claro.
- */
-function _mensajeErrorModificacion(errorMsg, correo) {
-  const msg = errorMsg.toLowerCase();
-
-  if (msg.includes('correo') || msg.includes('email') || msg.includes('duplicate') || msg.includes('ya está registrado') || msg.includes('ya está en uso')) {
-    return `El correo "${correo}" ya está en uso por otro usuario. Elige un correo diferente.`;
-  }
-  if (msg.includes('no existe') || msg.includes('not found') || msg.includes('no se puede actualizar')) {
-    return 'No se puede actualizar porque el paciente no existe en el sistema.';
-  }
-
-  return errorMsg;
-}
-
-setTimeout(() => {
-  document.querySelectorAll('.flash-messages li').forEach(el => {
-    el.style.transition = 'opacity 0.4s ease';
-    setTimeout(() => {
-      el.style.opacity = '0';
-      setTimeout(() => el.remove(), 400);
-    }, 3000);
-  });
-}, 200);
-
 
 /* ===== EXPEDIENTES ===== */
 function loadExpedientesList() {
@@ -447,14 +317,14 @@ function showExpDetail(idUsuario, el) {
 
 function guardarExpediente() {
   const alertEl = document.getElementById('alertExp');
-  const tel     = document.getElementById('expTelefono').value.trim();
-  const obj     = document.getElementById('expObjetivo').value.trim();
-  const diag    = document.getElementById('expDiag').value.trim();
-  const obs     = document.getElementById('expObs').value.trim();
-  const hist    = document.getElementById('expHistorial').value.trim();
+  const tel  = document.getElementById('expTelefono').value.trim();
+  const obj  = document.getElementById('expObjetivo').value.trim();
+  const diag = document.getElementById('expDiag').value.trim();
+  const obs  = document.getElementById('expObs').value.trim();
+  const hist = document.getElementById('expHistorial').value.trim();
   if (!tel || !obj || !diag || !obs || !hist) {
     alertEl.className = 'inline-alert error show';
-    alertEl.textContent = 'Todos los datos son obligatorios, favor de rellenarlos.';
+    alertEl.textContent = 'Todos los datos son obligatorios.';
     return;
   }
   fetch('/api/expedientes', {
@@ -469,8 +339,8 @@ function guardarExpediente() {
     });
 }
 
-function modificarExpediente(idUsuario) {
-  document.getElementById('modExpUsuarioId').value = idUsuario;
+function modificarExpediente(idExpediente) {
+  document.getElementById('modExpUsuarioId').value = idExpediente;
   openModal('modalModificarExp');
 }
 function guardarModificacionExp() {
@@ -501,7 +371,12 @@ function eliminarExpediente(idExp) {
     .then(r => r.json())
     .then(data => {
       if (data.error) showToast(data.error, 'error');
-      else { loadExpedientesList(); document.getElementById('expDetailTitle').textContent = 'Selecciona un paciente'; document.getElementById('expDetailBody').innerHTML = '<div class="empty-state"><p>Selecciona un paciente para ver su expediente</p></div>'; showToast('Expediente eliminado correctamente'); }
+      else {
+        loadExpedientesList();
+        document.getElementById('expDetailTitle').textContent = 'Selecciona un paciente';
+        document.getElementById('expDetailBody').innerHTML = '<div class="empty-state"><p>Selecciona un paciente para ver su expediente</p></div>';
+        showToast('Expediente eliminado correctamente');
+      }
     });
 }
 
@@ -529,6 +404,7 @@ function selectPlanPaciente(id, nombre, el) {
   document.querySelectorAll('.patient-list-item').forEach(x => x.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('planPacienteNombre').textContent = nombre;
+  
   fetch(`/api/planes/${id}`)
     .then(r => r.json())
     .then(plan => {
@@ -548,7 +424,12 @@ function selectPlanPaciente(id, nombre, el) {
       } else {
         panel.innerHTML = `
           <div class="pdf-drop-zone" id="dropZone" onclick="triggerPlanUpload()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.6;">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
             <p>Arrastra el PDF aquí o <span>selecciona el archivo</span></p>
             <p style="font-size:0.72rem;margin-top:0.5rem;">Solo archivos .pdf</p>
           </div>
@@ -578,13 +459,28 @@ function uploadPlanPDF(file) {
   const form = new FormData();
   form.append('pdf', file);
   form.append('id_usuario', selectedPlanUserId);
+  
   fetch('/api/planes/upload', { method: 'POST', body: form })
     .then(r => r.json())
     .then(data => {
       if (data.error) showToast(data.error, 'error');
-      else { showToast('Plan alimenticio subido correctamente'); selectPlanPaciente(selectedPlanUserId, document.getElementById('planPacienteNombre').textContent, document.querySelector('.patient-list-item.selected')); }
+      else { 
+        showToast('Plan alimenticio subido correctamente'); 
+        selectPlanPaciente(selectedPlanUserId, document.getElementById('planPacienteNombre').textContent, document.querySelector('.patient-list-item.selected')); 
+      }
     })
     .catch(() => showToast('Error al subir el plan', 'error'));
+}
+
+/* ===== CITAS — BUSCADOR AGENDA ===== */
+let agendaFiltro = '';
+let agendaDiaActual = { day: null, y: null, m: null };
+
+function filtrarAgenda(val) {
+  agendaFiltro = val.toLowerCase().trim();
+  if (agendaDiaActual.day !== null) {
+    renderAgenda(agendaDiaActual.day, agendaDiaActual.y, agendaDiaActual.m);
+  }
 }
 
 /* ===== CITAS — CALENDARIO ===== */
@@ -623,6 +519,7 @@ function renderCalendar() {
     .catch(() => {});
 
   const dayToShow = (m === today.getMonth() && y === today.getFullYear()) ? today.getDate() : 1;
+  agendaDiaActual = { day: dayToShow, y, m };
   renderAgenda(dayToShow, y, m);
 }
 
@@ -630,6 +527,7 @@ function selectDay(d) {
   document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
   const el = document.getElementById(`calDay${d}`);
   if (el) el.classList.add('selected');
+  agendaDiaActual = { day: d, y: calDate.getFullYear(), m: calDate.getMonth() };
   renderAgenda(d, calDate.getFullYear(), calDate.getMonth());
 }
 
@@ -642,8 +540,14 @@ function renderAgenda(day, y, m) {
   fetch(`/api/citas/dia?fecha=${fechaStr}`)
     .then(r => r.json())
     .then(citas => {
+      if (!citas.length) {
+        slots.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--t-cla);font-size:0.83rem;">No hay citas registradas</div>`;
+        return;
+      }
+      const filtro = agendaFiltro;
       slots.innerHTML = horas.map(h => {
-        const cita = citas.find(c => c.hora_cita.slice(0,5) === h);
+        const cita = citas.find(c => (c.hora_cita || '').toString().slice(0,5) === h);
+        if (cita && filtro && !cita.nombre_completo.toLowerCase().includes(filtro) && !cita.motivo_consulta.toLowerCase().includes(filtro)) return '';
         if (cita) {
           return `<div class="time-slot-row">
             <div class="time-label">${h}</div>
@@ -651,58 +555,86 @@ function renderAgenda(day, y, m) {
               <div class="cita-card ${cita.estado.toLowerCase()}">
                 <div class="cita-name">${cita.nombre_completo}</div>
                 <div class="cita-motivo">${cita.motivo_consulta}</div>
+                <div style="font-size:0.7rem;color:var(--t-cla);margin-top:0.1rem;">Tel: ${cita.telefono}</div>
                 <div class="cita-actions">
-                  <button class="act-btn red" onclick="cancelarCita(${cita.id_cita}, '${cita.nombre_completo}')">Cancelar</button>
+                  <span class="badge badge-${cita.estado.toLowerCase()}" style="margin-right:0.4rem;">${cita.estado}</span>
+                  <button class="act-btn red" onclick="abrirCancelarCita(${cita.id_cita}, '${cita.nombre_completo}')">Cancelar</button>
                 </div>
               </div>
             </div>
           </div>`;
         }
+        if (filtro) return '';
         return `<div class="time-slot-row"><div class="time-label">${h}</div><div style="flex:1"><div class="slot-empty"></div></div></div>`;
       }).join('');
     })
-    .catch(() => { if (slots) slots.innerHTML = ''; });
+    .catch(() => { if (slots) slots.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--t-cla);font-size:0.83rem;">Error al cargar la agenda</div>`; });
 }
 
-/* ===== GUARDAR CITA (nutriólogo) ===== */
+/* ===== GUARDAR NUEVA CITA ===== */
 function guardarCita() {
-  const tel     = document.getElementById('citaTel').value.trim();
-  const fecha   = document.getElementById('citaFecha').value;
-  const hora    = document.getElementById('citaHora').value;
-  const motivo  = document.getElementById('citaMotivo').value.trim();
-  const alertEl = document.getElementById('alertCita');
+  const tel          = document.getElementById('citaTel').value.trim();
+  const fecha        = document.getElementById('citaFecha').value;
+  const hora         = document.getElementById('citaHora').value;
+  const motivo       = document.getElementById('citaMotivo').value.trim();
+  const observaciones= document.getElementById('citaObservaciones')?.value.trim() || '';
+  const alertEl      = document.getElementById('alertCita');
+
   if (!tel || !fecha || !hora || !motivo) {
     alertEl.className = 'inline-alert error show';
     alertEl.textContent = 'Todos los campos obligatorios deben completarse.';
     return;
   }
+
   fetch('/api/citas', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ telefono: tel, fecha_cita: fecha, hora_cita: hora, motivo_consulta: motivo })
+    body: JSON.stringify({ telefono: tel, fecha_cita: fecha, hora_cita: hora, motivo_consulta: motivo, observaciones })
   })
     .then(r => r.json())
     .then(data => {
-      if (data.error) { alertEl.className = 'inline-alert error show'; alertEl.textContent = data.error; }
-      else { closeModal('modalNuevaCita'); renderCalendar(); showToast('Cita registrada correctamente'); }
-    });
+      if (data.error) {
+        alertEl.className = 'inline-alert error show';
+        alertEl.textContent = data.error;
+      } else {
+        closeModal('modalNuevaCita');
+        renderCalendar();
+        showToast('Cita registrada correctamente');
+      }
+    })
+    .catch(() => showToast('Error al conectar con el servidor', 'error'));
 }
 
-function cancelarCita(id, nombre) {
-  if (!confirm(`¿Cancelar la cita de ${nombre}?`)) return;
-  fetch(`/api/citas/${id}`, { method: 'DELETE' })
+/* ===== CANCELAR CITA ===== */
+function abrirCancelarCita(id, nombre) {
+  document.getElementById('cancelCitaIdNut').value = id;
+  document.getElementById('cancelCitaNombreNut').textContent = nombre;
+  document.getElementById('motivoCancelacion').value = '';
+  openModal('modalCancelarCita');
+}
+
+function confirmarCancelacionNut() {
+  const id     = document.getElementById('cancelCitaIdNut').value;
+  const motivo = document.getElementById('motivoCancelacion').value.trim() || 'Cancelada por el nutriólogo';
+
+  fetch(`/api/citas/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ motivo_cancelacion: motivo })
+  })
     .then(r => r.json())
     .then(data => {
       if (data.error) showToast(data.error, 'error');
-      else { renderCalendar(); showToast('Cita cancelada correctamente'); }
-    });
+      else { closeModal('modalCancelarCita'); renderCalendar(); showToast('Cita cancelada correctamente'); }
+    })
+    .catch(() => showToast('Error al cancelar la cita', 'error'));
 }
 
 /* ===== TOAST ===== */
 function showToast(msg, type = 'success') {
   const t = document.createElement('div');
-  t.style.cssText = `position:fixed;bottom:1.5rem;right:1.5rem;background:${type === 'success' ? 'var(--marino)' : 'var(--rojo)'};color:#fff;padding:0.75rem 1.25rem;border-radius:10px;font-size:0.83rem;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.15);max-width:320px;animation:fadeIn 0.2s ease;`;
+  t.style.cssText = `position:fixed;bottom:1.5rem;right:1.5rem;background:${type === 'success' ? 'var(--marino)' : 'var(--rojo)'};color:#fff;padding:0.75rem 1.25rem;border-radius:10px;font-size:0.83rem;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.15);max-width:320px;`;
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3200);
+  setTimeout(() => t.remove(), 3500);
 }

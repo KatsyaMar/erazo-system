@@ -18,6 +18,8 @@
     <button class="nav-link active" onclick="showView('inicio', this)">Inicio</button>
     <button class="nav-link" onclick="showView('plan', this)">Mi Plan</button>
     <button class="nav-link" onclick="showView('citas', this)">Mis Citas</button>
+    <button class="nav-link"onclick="showView('expediente', this);cargarExpediente();">Mi Expediente</button>
+
   </div>
   <div class="nav-right">
     <button class="notif-btn">
@@ -86,6 +88,7 @@
           <div class="card-body">
             <button class="quick-action" onclick="showView('citas', null); setTimeout(()=>openModal('modalNuevaCita'),100)">📅 Agendar nueva cita</button>
             <button class="quick-action" onclick="showView('plan', document.querySelector('.nav-link:nth-child(2)'))">📄 Ver mi plan alimenticio</button>
+            <button class="quick-action"onclick="showView('expediente', document.querySelectorAll('.nav-link')[3]);cargarExpediente();">📄 Ver expediente</button>
           </div>
         </div>
       </div>
@@ -119,8 +122,34 @@
       ⚠️ Para cancelar con menos de 48 horas de anticipación, contacta directamente a tu nutriólogo.
     </div>
   </div>
+</div>
+
+<!-- ===== EXPEDIENTE ===== -->
+<div id="view-expediente" class="content-view">
+  
+  <div style="margin-bottom:1.2rem;">
+    <div class="section-title-lg">Mi Expediente</div>
+    <div class="section-sub">
+      Consulta la información registrada por tu nutriólogo.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      Información del expediente
+    </div>
+
+    <div id="expedienteContent" class="card-body">
+      <p style="color:var(--t-cla);font-size:0.83rem;">
+        Cargando expediente...
+      </p>
+    </div>
+  </div>
 
 </div>
+
+
+
 
 <!-- ===== MODALES ===== -->
 
@@ -181,7 +210,8 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='../js/paciente.js') }}"></script>
+<!-- ✅ CORRECCIÓN: ruta del JS arreglada (se eliminó el ../) -->
+<script src="{{ url_for('static', filename='js/paciente.js') }}"></script>
 <script>
 // Cargar datos del héro al iniciar
 document.addEventListener('DOMContentLoaded', () => {
@@ -196,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(r => r.json())
     .then(d => {
       if (d.cita) {
-        const f = new Date(d.cita.fecha_cita);
+        const [fy,fm,fd] = d.cita.fecha_cita.split("-").map(Number); const f = new Date(fy, fm-1, fd);
         const m = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
         document.getElementById('statCitas').textContent = `${f.getDate()} ${m[f.getMonth()]}`;
       } else {
@@ -206,4 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
+
+    <!-- ===== Cargar scrip para mostrar expediente a paciente ===== -->
+    <script src="{{ url_for('static', filename='js/paciente.js') }}"></script>
+
 </html>
