@@ -444,7 +444,6 @@ function selectPlanPaciente(id, nombre, el) {
 function triggerPlanUpload() {
   document.getElementById('planPdfInput').click();
 }
-
 function handleDragOver(e)  { e.preventDefault(); document.getElementById('dropZone')?.classList.add('dragover'); }
 function handleDragLeave(e) { document.getElementById('dropZone')?.classList.remove('dragover'); }
 function handleDrop(e) {
@@ -454,7 +453,6 @@ function handleDrop(e) {
   if (file && file.type === 'application/pdf') uploadPlanPDF(file);
   else showToast('Solo se permiten archivos PDF', 'error');
 }
-
 function uploadPlanPDF(file) {
   if (!selectedPlanUserId) return;
   if (!file || file.type !== 'application/pdf') { showToast('Solo se permiten archivos PDF', 'error'); return; }
