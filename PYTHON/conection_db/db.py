@@ -23,3 +23,4 @@ def get_db_connection():
 def close_db_connection(connection):
     if connection and connection.is_connected():
         connection.close()
+        

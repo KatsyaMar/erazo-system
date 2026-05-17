@@ -18,6 +18,7 @@ function showView(key, btn) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (key === 'plan')   loadPlan();
   if (key === 'citas')  loadCitas();
+  if (key === 'expediente') cargarExpediente();
 }
 
 /* ===== MODALES ===== */
@@ -41,8 +42,14 @@ function loadPlan() {
     .then(r => r.json())
     .then(data => {
       const body = document.getElementById('planContent');
+      const cajitaPlan = document.getElementById('statPlan'); // Buscamos la tarjeta de arriba
+
       if (!body) return;
+
       if (data.tiene_plan && data.pdf_url) {
+        // Si hay plan, cambiamos el texto a "Activo"
+        if (cajitaPlan) cajitaPlan.textContent = 'Activo';
+
         body.innerHTML = `
           <div class="pdf-container">
             <div class="pdf-toolbar">
@@ -55,6 +62,9 @@ function loadPlan() {
             <iframe src="${data.pdf_url}" title="Mi plan alimenticio"></iframe>
           </div>`;
       } else {
+        // Si no hay plan, aseguramos que diga "Sin plan"
+        if (cajitaPlan) cajitaPlan.textContent = 'Sin plan';
+
         body.innerHTML = `
           <div class="no-plan-state">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -73,8 +83,13 @@ function loadPlanResumen() {
     .then(r => r.json())
     .then(data => {
       const el = document.getElementById('quickPlanResumen');
+      const cajitaPlan = document.getElementById('statPlan'); 
+      
       if (!el) return;
+
       if (data.tiene_plan) {
+        if (cajitaPlan) cajitaPlan.textContent = 'Activo'; // Actualiza desde el resumen
+
         el.innerHTML = `
           <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid #f2f0ea;">
             <div style="width:8px;height:8px;border-radius:50%;background:var(--teal)"></div>
@@ -83,10 +98,18 @@ function loadPlanResumen() {
           </div>
           <p style="font-size:0.75rem;color:var(--t-cla);margin-top:0.75rem;">Revisa la pestaña "Mi Plan" para ver el detalle completo.</p>`;
       } else {
+        if (cajitaPlan) cajitaPlan.textContent = 'Sin plan'; // Actualiza desde el resumen
+
         el.innerHTML = `<p style="font-size:0.82rem;color:var(--t-cla);">Tu nutriólogo aún no ha subido tu plan alimenticio.</p>`;
       }
     });
 }
+
+/* Cargar estado del plan desde que se entra a la pagina*/
+document.addEventListener('DOMContentLoaded', () => {
+    loadPlan();
+    loadPlanResumen();
+});
 
 /* ===== CITAS ===== */
 function loadCitas() {
@@ -286,3 +309,248 @@ function showToast(msg, type = 'success') {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3200);
 }
+
+/* ========= Cargar plan desde paciente ========*/
+document.addEventListener('DOMContentLoaded', () => {
+    cargarExpediente();
+});
+
+function cargarExpediente() {
+  fetch('/api/paciente/expediente')
+    .then(r => r.json())
+    .then(data => {
+      const cont = document.getElementById('expedienteContent');
+
+      if (data.error) {
+        cont.innerHTML = `
+          <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 1rem; border-radius: 8px; color: #991b1b;">
+            ⚠️ ${data.error}
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = `
+        <style>
+          .expediente-modern {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 100%;
+          }
+          .metric-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+          }
+          .metric-card {
+            background: linear-gradient(135deg, #007576 0%, #2F4858 100%);
+            border-radius: 20px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+          }
+          .metric-card:hover {
+            transform: translateY(-3px);
+          }
+          .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.2;
+          }
+          .metric-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+            letter-spacing: 0.5px;
+          }
+          .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 1.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+          }
+          .info-row {
+            display: flex;
+            background: #f9fafb;
+            border-radius: 16px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            transition: all 0.2s;
+          }
+          .info-label {
+            width: 180px;
+            background: #f3f4f6;
+            padding: 1rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+            border-right: 1px solid #e5e7eb;
+          }
+          .info-content {
+            flex: 1;
+            padding: 1rem;
+            color: #111827;
+            background: white;
+            word-break: break-word;
+          }
+          .empty-message {
+            color: #9ca3af;
+            font-style: italic;
+          }
+          @media (max-width: 640px) {
+            .info-row {
+              flex-direction: column;
+            }
+            .info-label {
+              width: 100%;
+              border-right: none;
+              border-bottom: 1px solid #e5e7eb;
+            }
+            .metric-value {
+              font-size: 1.5rem;
+            }
+          }
+        </style>
+
+        <div class="expediente-modern">
+          <!-- Tarjetas de métricas principales -->
+          <div class="metric-grid-modern">
+            <div class="metric-card">
+              <div class="metric-value">${parseFloat(data.peso).toFixed(1)} kg</div>
+              <div class="metric-label">Peso actual</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">${parseFloat(data.estatura).toFixed(2)} m</div>
+              <div class="metric-label">Estatura</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">${parseFloat(data.imc).toFixed(1)}</div>
+              <div class="metric-label">Índice de Masa Corporal</div>
+            </div>
+          </div>
+
+          <!-- Información detallada -->
+          <div class="section-title">📋 Información clínica</div>
+          
+          ${renderField('🎯 Objetivo Nutricional', data.objetivo_nutricional)}
+          ${renderField('🩺 Diagnóstico Inicial', data.diagnostico_inicial)}
+          ${renderField('📝 Observaciones Médicas', data.observaciones_medicas)}
+          ${renderField('📚 Historial Clínico', data.historial_clinico)}
+          ${renderField('✨ Nuevas Observaciones', data.nuevas_observaciones || 'Sin observaciones')}
+        </div>
+      `;
+    });
+}
+
+// Función auxiliar para renderizar cada campo
+function renderField(label, content) {
+  const hasContent = content && content.trim() !== '' && content !== 'Sin observaciones';
+  return `
+    <div class="info-row">
+      <div class="info-label">${label}</div>
+      <div class="info-content ${!hasContent ? 'empty-message' : ''}">
+        ${hasContent ? content.replace(/\n/g, '<br>') : '— Sin información registrada —'}
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICACIONES
+// ═══════════════════════════════════════════════════════
+(function () {
+  const POLL_INTERVAL = 30000;
+
+  function toggleNotifDropdown() {
+    const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    const isOpen = dd.classList.toggle('open');
+    if (isOpen) cargarNotificaciones();
+  }
+
+  async function cargarNotificaciones() {
+    const list  = document.getElementById('notifList');
+    const badge = document.getElementById('notifBadge');
+    try {
+      const res  = await fetch('/api/notificaciones');
+      const data = await res.json();
+      const { notificaciones, no_leidas } = data;
+
+      if (no_leidas > 0) {
+        badge.textContent = no_leidas > 9 ? '9+' : no_leidas;
+        badge.classList.add('visible');
+      } else {
+        badge.textContent = '';
+        badge.classList.remove('visible');
+      }
+
+      if (!notificaciones || notificaciones.length === 0) {
+        list.innerHTML = '<div class="notif-empty">Sin notificaciones</div>';
+        return;
+      }
+      list.innerHTML = notificaciones.map(n => `
+        <div class="notif-item ${n.leida ? 'leida' : 'no-leida'}"
+             onclick="marcarUnaLeida(${n.id_notificacion}, this)">
+          <div class="notif-indicador"></div>
+          <div style="flex:1">
+            <div class="notif-texto">${n.mensaje}</div>
+            <div class="notif-fecha">${n.fecha_envio}</div>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      if (list) list.innerHTML = '<div class="notif-empty">Error al cargar</div>';
+    }
+  }
+
+  async function marcarTodasLeidas() {
+    await fetch('/api/notificaciones/leer', { method: 'PUT' });
+    cargarNotificaciones();
+  }
+
+  async function marcarUnaLeida(id, el) {
+    if (el.classList.contains('leida')) return;
+    await fetch(`/api/notificaciones/${id}/leer`, { method: 'PUT' });
+    el.classList.remove('no-leida');
+    el.classList.add('leida');
+    el.querySelector('.notif-indicador').style.background = 'transparent';
+    el.querySelector('.notif-indicador').style.border = '1px solid #ccc';
+    const badge = document.getElementById('notifBadge');
+    const curr  = parseInt(badge.textContent) || 0;
+    const next  = curr - 1;
+    if (next <= 0) { badge.textContent = ''; badge.classList.remove('visible'); }
+    else { badge.textContent = next > 9 ? '9+' : next; }
+  }
+
+  document.addEventListener('click', function (e) {
+    const wrapper = document.getElementById('notifWrapper');
+    const dd      = document.getElementById('notifDropdown');
+    if (wrapper && dd && !wrapper.contains(e.target)) {
+      dd.classList.remove('open');
+    }
+  });
+
+  window.toggleNotifDropdown = toggleNotifDropdown;
+  window.marcarTodasLeidas   = marcarTodasLeidas;
+  window.marcarUnaLeida      = marcarUnaLeida;
+
+  function pollBadge() {
+    fetch('/api/notificaciones')
+      .then(r => r.json())
+      .then(data => {
+        const badge = document.getElementById('notifBadge');
+        if (!badge) return;
+        const n = data.no_leidas || 0;
+        if (n > 0) { badge.textContent = n > 9 ? '9+' : n; badge.classList.add('visible'); }
+        else        { badge.textContent = ''; badge.classList.remove('visible'); }
+      }).catch(() => {});
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    pollBadge();
+    setInterval(pollBadge, POLL_INTERVAL);
+  });
+})();

@@ -186,8 +186,8 @@ def restablecer_contrasena(token):
 # ──────────────────────────────────────────────────
 def _redirect_by_rol(rol):
     if rol == 'NUTRIOLOGO':
-        return redirect(url_for('dashboard_nutriologo'))
-    return redirect(url_for('dashboard_paciente'))
+        return redirect(url_for('dashboard_nutriologo'))  # ← CORREGIDO
+    return redirect(url_for('dashboard_paciente'))         # ← CORREGIDO
 
 
 def _enviar_correo_recuperacion(destinatario, enlace):
