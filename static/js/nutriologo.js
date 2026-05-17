@@ -34,12 +34,24 @@ function openModal(id) {
 
 function closeModal(id) {
   document.getElementById(id).classList.remove('show');
+
+  // Limpiar alertas inline
   document.querySelectorAll(`#${id} .inline-alert`).forEach(a => {
     a.className = 'inline-alert';
     a.textContent = '';
   });
-  const imc = document.getElementById('imcDisplay');
-  if (imc) imc.textContent = '—';
+
+  // ── FIX 1: limpiar TODOS los inputs/textareas/selects del modal al cerrarlo ──
+  // Esto evita que al abrir el modal de nuevo aparezcan datos del registro anterior
+  document.querySelectorAll(`#${id} input:not([type="hidden"]), #${id} textarea, #${id} select`).forEach(el => {
+    el.value = '';
+  });
+
+  // Resetear displays de IMC
+  const imcN = document.getElementById('imcDisplay');
+  if (imcN) imcN.textContent = '—';
+  const imcM = document.getElementById('mImcDisplay');
+  if (imcM) imcM.textContent = '—';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -47,7 +59,24 @@ document.addEventListener('DOMContentLoaded', () => {
     m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
   });
   renderPatients();
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      const secPacientes = document.getElementById('sec-pacientes');
+      if (secPacientes && secPacientes.classList.contains('active')) {
+        renderPatients();
+      }
+    }
+  });
 });
+
+/* ===== FIX 2: VALIDACIÓN DE CORREO ===== */
+// Regex reutilizada en registro y en modificación
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validarCorreo(correo) {
+  return EMAIL_REGEX.test(correo);
+}
 
 /* ===== IMC ===== */
 function calcIMC() {
@@ -211,22 +240,39 @@ function guardarPaciente() {
   const estatura = document.getElementById('pEstatura').value;
   const alertEl  = document.getElementById('alertPaciente');
 
+  // Validar campos vacíos
   if (!nombre || !tel || !correo || !pass || !edad || !peso || !estatura) {
     alertEl.className = 'inline-alert error show';
     alertEl.textContent = 'Datos incompletos, favor de llenar todos los campos.';
     return;
   }
 
+  // ── FIX 2: Validar formato de correo antes de llamar al servidor ──
+  if (!validarCorreo(correo)) {
+    alertEl.className = 'inline-alert error show';
+    alertEl.textContent = 'El correo electrónico no es válido. Debe tener el formato: ejemplo@dominio.com';
+    return;
+  }
+
   fetch('/api/pacientes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nombre_completo: nombre, telefono: tel, correo, contrasena: pass, edad: parseInt(edad), peso: parseFloat(peso), estatura: parseFloat(estatura) })
+    body: JSON.stringify({
+      nombre_completo: nombre,
+      telefono: tel,
+      correo,
+      contrasena: pass,
+      edad: parseInt(edad),
+      peso: parseFloat(peso),
+      estatura: parseFloat(estatura)
+    })
   })
     .then(r => r.json())
     .then(data => {
       if (data.error) {
         alertEl.className = 'inline-alert error show';
-        alertEl.textContent = data.error;
+        // ── FIX 3: mensaje específico según el campo duplicado ──
+        alertEl.textContent = _mensajeErrorRegistro(data.error, tel, correo);
       } else {
         closeModal('modalNuevoPaciente');
         renderPatients();
@@ -235,7 +281,7 @@ function guardarPaciente() {
     })
     .catch(() => {
       alertEl.className = 'inline-alert error show';
-      alertEl.textContent = 'Error al registrar el paciente.';
+      alertEl.textContent = 'No se pudo conectar con el servidor. Intente de nuevo.';
     });
 }
 
@@ -255,16 +301,30 @@ function guardarModificacion() {
     return;
   }
 
+  // ── FIX 2: Validar formato de correo también en modificación ──
+  if (!validarCorreo(correo)) {
+    alertEl.className = 'inline-alert error show';
+    alertEl.textContent = 'El correo electrónico no es válido. Debe tener el formato: ejemplo@dominio.com';
+    return;
+  }
+
   fetch(`/api/pacientes/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nombre_completo: nombre, correo, edad: parseInt(edad), peso: parseFloat(peso), estatura: parseFloat(estatura) })
+    body: JSON.stringify({
+      nombre_completo: nombre,
+      correo,
+      edad: parseInt(edad),
+      peso: parseFloat(peso),
+      estatura: parseFloat(estatura)
+    })
   })
     .then(r => r.json())
     .then(data => {
       if (data.error) {
         alertEl.className = 'inline-alert error show';
-        alertEl.textContent = data.error;
+        // ── FIX 3: mensaje específico para correo duplicado en modificación ──
+        alertEl.textContent = _mensajeErrorModificacion(data.error, correo);
       } else {
         closeModal('modalModificarPaciente');
         renderPatients();
@@ -273,14 +333,61 @@ function guardarModificacion() {
     })
     .catch(() => {
       alertEl.className = 'inline-alert error show';
-      alertEl.textContent = 'Error al modificar el paciente.';
+      alertEl.textContent = 'No se pudo conectar con el servidor. Intente de nuevo.';
     });
+}
+
+/* ===== HELPERS — Mensajes de error específicos ===== */
+
+/**
+ * Interpreta el error del servidor al REGISTRAR un paciente
+ * y devuelve un mensaje claro indicando el campo duplicado.
+ */
+function _mensajeErrorRegistro(errorMsg, tel, correo) {
+  const msg = errorMsg.toLowerCase();
+
+  // MySQL lanza "Duplicate entry 'valor' for key 'nombre_columna'"
+  // El backend puede reenviar ese mensaje o uno propio
+  if (msg.includes('duplicate entry') || msg.includes('ya se encuentra registrado') || msg.includes('ya está registrado')) {
+    // Intentar detectar cuál campo es
+    if (msg.includes('telefono') || msg.includes(tel.toLowerCase())) {
+      return `El teléfono "${tel}" ya está registrado por otro paciente.`;
+    }
+    if (msg.includes('correo') || msg.includes('email') || msg.includes(correo.toLowerCase())) {
+      return `El correo "${correo}" ya está registrado por otro paciente.`;
+    }
+    // Si el backend no especifica cuál campo, indicar ambos
+    return `Ya existe un paciente con ese teléfono o correo electrónico. Verifica los datos e intenta de nuevo.`;
+  }
+
+  if (msg.includes('incompletos') || msg.includes('llenar todos')) {
+    return errorMsg;
+  }
+
+  // Devolver el mensaje original si no encaja en ningún caso
+  return errorMsg;
+}
+
+/**
+ * Interpreta el error del servidor al MODIFICAR un paciente
+ * y devuelve un mensaje claro.
+ */
+function _mensajeErrorModificacion(errorMsg, correo) {
+  const msg = errorMsg.toLowerCase();
+
+  if (msg.includes('correo') || msg.includes('email') || msg.includes('duplicate') || msg.includes('ya está registrado') || msg.includes('ya está en uso')) {
+    return `El correo "${correo}" ya está en uso por otro usuario. Elige un correo diferente.`;
+  }
+  if (msg.includes('no existe') || msg.includes('not found') || msg.includes('no se puede actualizar')) {
+    return 'No se puede actualizar porque el paciente no existe en el sistema.';
+  }
+
+  return errorMsg;
 }
 
 setTimeout(() => {
   document.querySelectorAll('.flash-messages li').forEach(el => {
     el.style.transition = 'opacity 0.4s ease';
-    
     setTimeout(() => {
       el.style.opacity = '0';
       setTimeout(() => el.remove(), 400);
@@ -505,7 +612,6 @@ function renderCalendar() {
   for (let d = 1; d <= remaining; d++) html += `<div class="cal-day other-month">${d}</div>`;
   document.getElementById('calGrid').innerHTML = html;
 
-  // Cargar citas del mes
   fetch(`/api/citas/mes?year=${y}&month=${m + 1}`)
     .then(r => r.json())
     .then(data => {
@@ -516,7 +622,6 @@ function renderCalendar() {
     })
     .catch(() => {});
 
-  // Mostrar agenda del día actual o del 1ero
   const dayToShow = (m === today.getMonth() && y === today.getFullYear()) ? today.getDate() : 1;
   renderAgenda(dayToShow, y, m);
 }
@@ -530,8 +635,8 @@ function selectDay(d) {
 
 function renderAgenda(day, y, m) {
   document.getElementById('agendaDayTitle').textContent = `Agenda – ${day} ${MESES[m]}`;
-  const slots   = document.getElementById('agendaSlots');
-  const horas   = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
+  const slots    = document.getElementById('agendaSlots');
+  const horas    = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
   const fechaStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 
   fetch(`/api/citas/dia?fecha=${fechaStr}`)
@@ -561,13 +666,15 @@ function renderAgenda(day, y, m) {
 
 /* ===== GUARDAR CITA (nutriólogo) ===== */
 function guardarCita() {
-  const tel    = document.getElementById('citaTel').value.trim();
-  const fecha  = document.getElementById('citaFecha').value;
-  const hora   = document.getElementById('citaHora').value;
-  const motivo = document.getElementById('citaMotivo').value.trim();
+  const tel     = document.getElementById('citaTel').value.trim();
+  const fecha   = document.getElementById('citaFecha').value;
+  const hora    = document.getElementById('citaHora').value;
+  const motivo  = document.getElementById('citaMotivo').value.trim();
   const alertEl = document.getElementById('alertCita');
   if (!tel || !fecha || !hora || !motivo) {
-    alertEl.className = 'inline-alert error show'; alertEl.textContent = 'Todos los campos obligatorios deben completarse.'; return;
+    alertEl.className = 'inline-alert error show';
+    alertEl.textContent = 'Todos los campos obligatorios deben completarse.';
+    return;
   }
   fetch('/api/citas', {
     method: 'POST',
