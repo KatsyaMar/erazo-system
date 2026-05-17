@@ -1,11 +1,12 @@
 # PYTHON/routes/auth.py
-# ─────────────────────────────────────────────────────────────────────────────
+
 # Módulo de autenticación: login, logout y recuperación de contraseña
-# ─────────────────────────────────────────────────────────────────────────────
+
 import smtplib
 import os
 from email.mime.text      import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask                import session
 from datetime             import datetime, timedelta
 
 from flask               import Blueprint, render_template, request, redirect, url_for, flash, current_app
@@ -19,9 +20,9 @@ from PYTHON.authentication.login     import verificar_usuario
 auth_bp = Blueprint('auth', __name__)
 
 
-# ──────────────────────────────────────────────────
+
 # LOGIN
-# ──────────────────────────────────────────────────
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     # Si ya está autenticado, redirigir a su panel
@@ -101,18 +102,18 @@ def login():
     return render_template('index.html')
 
 
-# ──────────────────────────────────────────────────
+
 # LOGOUT
-# ──────────────────────────────────────────────────
+
 @auth_bp.route('/logout')
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for('auth.login'))
 
 
-# ──────────────────────────────────────────────────
 # RECUPERAR CONTRASEÑA — solicitar enlace
-# ──────────────────────────────────────────────────
+
 @auth_bp.route('/solicitar-recuperacion', methods=['GET', 'POST'])
 def solicitar_recuperacion():
     if request.method == 'POST':
@@ -142,9 +143,9 @@ def solicitar_recuperacion():
     return render_template('index.html', mostrar_recuperacion=True)
 
 
-# ──────────────────────────────────────────────────
+
 # RECUPERAR CONTRASEÑA — restablecer
-# ──────────────────────────────────────────────────
+
 @auth_bp.route('/restablecer-contrasena/<token>', methods=['GET', 'POST'])
 def restablecer_contrasena(token):
     s = URLSafeTimedSerializer(current_app.secret_key)
@@ -181,9 +182,9 @@ def restablecer_contrasena(token):
     return render_template('index.html', mostrar_reset=True, token=token)
 
 
-# ──────────────────────────────────────────────────
+
 # HELPERS PRIVADOS
-# ──────────────────────────────────────────────────
+
 def _redirect_by_rol(rol):
     if rol == 'NUTRIOLOGO':
         return redirect(url_for('dashboard_nutriologo'))

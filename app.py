@@ -1,8 +1,11 @@
 import os
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import generate_password_hash 
+from PYTHON.routes.notificaciones import notificaciones_bp
 
 # Importaciones de los modulos locales
 from PYTHON.conection_db.db import get_db_connection 
@@ -33,6 +36,13 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login'
 
+@app.after_request
+def add_header(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db_connection()
@@ -60,9 +70,10 @@ def index():
 
 # Registro de blueprints
 app.register_blueprint(auth_bp)
-app.register_blueprint(pacientes_bp)  # ← AGREGADO
-app.register_blueprint(citas_bp)      # ← AGREGADO
+app.register_blueprint(pacientes_bp)  
+app.register_blueprint(citas_bp)      
 app.register_blueprint(expedientes_bp)
+app.register_blueprint(notificaciones_bp)
 
 
 

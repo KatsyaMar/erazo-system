@@ -1,232 +1,317 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Erazo System – Mi Portal</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/paciente.css') }}">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erazo System – Mi Portal</title>
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/paciente.css') }}">
+  </head>
+  <body>
 
-<!-- TOP NAV -->
-<nav class="topnav">
-  <div class="nav-brand">
-    <div class="nav-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1 14.5v-5L7 14l5-8v5l4-2.5-5 8z"/></svg></div>
-    <span class="nav-brand-text">Erazo System</span>
-  </div>
-  <div class="nav-links">
-    <button class="nav-link active" onclick="showView('inicio', this)">Inicio</button>
-    <button class="nav-link" onclick="showView('plan', this)">Mi Plan</button>
-    <button class="nav-link" onclick="showView('citas', this)">Mis Citas</button>
-    <button class="nav-link"onclick="showView('expediente', this);cargarExpediente();">Mi Expediente</button>
+    <!-- TOP NAV -->
+    <nav class="topnav">
+      <div class="nav-brand">
+        <div class="nav-logo"><svg viewBox="0 0 24 24"><path
+              d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1 14.5v-5L7 14l5-8v5l4-2.5-5 8z" /></svg></div>
+        <span class="nav-brand-text">Erazo System</span>
+      </div>
+      <div class="nav-links">
+        <button class="nav-link active"
+          onclick="showView('inicio', this)">Inicio</button>
+        <button class="nav-link" onclick="showView('plan', this)">Mi
+          Plan</button>
+        <button class="nav-link" onclick="showView('citas', this)">Mis
+          Citas</button>
+        <button class="nav-link"
+          onclick="showView('expediente', this); cargarExpediente();">Mi
+          Expediente</button>
+      </div>
+      <div class="nav-right">
+        <button class="notif-btn" id="btnNotificaciones" type="button">
+          <svg viewBox="0 0 24 24"><path
+              d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path
+              d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+          <div class="notif-dot"></div>
+        </button>
+        <a class="avatar-btn" href="{{ url_for('auth.logout') }}"
+          style="text-decoration:none;">
+          <div class="av-circle">{{ usuario.nombre[:2].upper() if usuario is
+            defined else 'PA' }}</div>
+          {{ usuario.nombre.split()[0] if usuario is defined else 'Paciente' }}
+        </a>
+      </div>
+    </nav>
 
-  </div>
-  <div class="nav-right">
-    <button class="notif-btn">
-      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <div class="notif-dot"></div>
-    </button>
-    <a class="avatar-btn" href="{{ url_for('auth.logout') }}" style="text-decoration:none;">
-      <div class="av-circle">{{ usuario.nombre[:2].upper() if usuario is defined else 'PA' }}</div>
-      {{ usuario.nombre.split()[0] if usuario is defined else 'Paciente' }}
-    </a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-inner">
-    <div class="greeting">¡Hola, <em>{{ usuario.nombre.split()[0] if usuario is defined else 'Usuario' }}!</em> Bienvenido a tu portal</div>
-    <div class="greeting-sub">Consulta tu plan alimenticio y gestiona tus citas con tu nutriólogo</div>
-    <div class="hero-stats" id="heroStats">
-      <div class="hero-stat"><div class="sv" id="statPeso">—</div><div class="sl">Peso actual</div></div>
-      <div class="hero-stat"><div class="sv" id="statIMC">—</div><div class="sl">IMC</div></div>
-      <div class="hero-stat"><div class="sv" id="statCitas">—</div><div class="sl">Próxima cita</div></div>
-      <div class="hero-stat"><div class="sv" id="statPlan">—</div><div class="sl">Plan</div></div>
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="greeting">¡Hola, <em>{{ usuario.nombre.split()[0] if usuario
+            is defined else 'Usuario' }}!</em> Bienvenido a tu portal</div>
+        <div class="greeting-sub">Consulta tu plan alimenticio y gestiona tus
+          citas con tu nutriólogo</div>
+        <div class="hero-stats" id="heroStats">
+          <div class="hero-stat"><div class="sv" id="statPeso">—</div><div
+              class="sl">Peso actual</div></div>
+          <div class="hero-stat"><div class="sv" id="statIMC">—</div><div
+              class="sl">IMC</div></div>
+          <div class="hero-stat"><div class="sv" id="statCitas">—</div><div
+              class="sl">Próxima cita</div></div>
+          <div class="hero-stat"><div class="sv" id="statPlan">—</div><div
+              class="sl">Plan</div></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- CONTENIDO -->
-<div class="page-content">
+    <!-- CONTENIDO -->
+    <div class="page-content">
 
-  <!-- ===== INICIO ===== -->
-  <div id="view-inicio" class="content-view active">
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.4rem;align-items:start;">
-      <div>
-        <div class="section-title-lg">Tu resumen</div>
-        <div class="section-sub">Vista rápida de tu plan y próxima cita</div>
-        <div class="card" style="margin-bottom:1.2rem;">
-          <div class="card-header">
-            <span class="card-title">Mi plan alimenticio</span>
-            <button class="cit-btn" onclick="showView('plan', document.querySelector('.nav-link:nth-child(2)'))">Ver completo</button>
+      <!-- ===== INICIO ===== -->
+      <div id="view-inicio" class="content-view active">
+        <div
+          style="display:grid;grid-template-columns:2fr 1fr;gap:1.4rem;align-items:start;">
+          <div>
+            <div class="section-title-lg">Tu resumen</div>
+            <div class="section-sub">Vista rápida de tu plan y próxima
+              cita</div>
+            <div class="card" style="margin-bottom:1.2rem;">
+              <div class="card-header">
+                <span class="card-title">Mi plan alimenticio</span>
+                <button class="cit-btn"
+                  onclick="showView('plan', document.querySelector('.nav-link:nth-child(2)'))">Ver
+                  completo</button>
+              </div>
+              <div class="card-body" id="quickPlanResumen">
+                <p style="color:var(--t-cla);font-size:0.83rem;">Cargando...</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Progreso
+                  estimado</span></div>
+              <div class="card-body">
+                <div class="progress-row"><span
+                    class="progress-label">Proteínas</span><div
+                    class="progress-bar"><div class="progress-fill"
+                      style="width:72%"></div></div><span
+                    class="progress-val">72%</span></div>
+                <div class="progress-row"><span
+                    class="progress-label">Carbohidratos</span><div
+                    class="progress-bar"><div class="progress-fill"
+                      style="width:55%;background:var(--naranja)"></div></div><span
+                    class="progress-val">55%</span></div>
+                <div class="progress-row"><span
+                    class="progress-label">Grasas</span><div
+                    class="progress-bar"><div class="progress-fill"
+                      style="width:80%"></div></div><span
+                    class="progress-val">80%</span></div>
+                <div class="progress-row"><span
+                    class="progress-label">Fibra</span><div
+                    class="progress-bar"><div class="progress-fill"
+                      style="width:40%;background:#8b5cf6"></div></div><span
+                    class="progress-val">40%</span></div>
+                <p
+                  style="font-size:0.72rem;color:var(--t-cla);margin-top:0.5rem;">*
+                  Basado en los objetivos de tu plan actual</p>
+              </div>
+            </div>
           </div>
-          <div class="card-body" id="quickPlanResumen">
-            <p style="color:var(--t-cla);font-size:0.83rem;">Cargando...</p>
+          <div>
+            <div class="card" style="margin-bottom:1.2rem;">
+              <div class="card-header"><span class="card-title">Próxima
+                  cita</span></div>
+              <div class="card-body" id="proximaCitaInfo">
+                <p
+                  style="color:var(--t-cla);font-size:0.83rem;text-align:center;">Cargando...</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Acciones
+                  rápidas</span></div>
+              <div class="card-body">
+                <button class="quick-action"
+                  onclick="showView('citas', null); setTimeout(()=>openModal('modalNuevaCita'),100)">📅
+                  Agendar nueva cita</button>
+                <button class="quick-action"
+                  onclick="showView('plan', document.querySelector('.nav-link:nth-child(2)'))">📄
+                  Ver mi plan alimenticio</button>
+                <button class="quick-action"
+                  onclick="showView('expediente', document.querySelectorAll('.nav-link')[3]); cargarExpediente();">📄
+                  Ver expediente</button>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- ===== PLAN ALIMENTICIO ===== -->
+      <div id="view-plan" class="content-view">
+        <div class="section-title-lg">Mi Plan Alimenticio</div>
+        <div class="section-sub">Diseñado por tu nutriólogo · Solo lectura</div>
         <div class="card">
-          <div class="card-header"><span class="card-title">Progreso estimado</span></div>
-          <div class="card-body">
-            <div class="progress-row"><span class="progress-label">Proteínas</span><div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div><span class="progress-val">72%</span></div>
-            <div class="progress-row"><span class="progress-label">Carbohidratos</span><div class="progress-bar"><div class="progress-fill" style="width:55%;background:var(--naranja)"></div></div><span class="progress-val">55%</span></div>
-            <div class="progress-row"><span class="progress-label">Grasas</span><div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div><span class="progress-val">80%</span></div>
-            <div class="progress-row"><span class="progress-label">Fibra</span><div class="progress-bar"><div class="progress-fill" style="width:40%;background:#8b5cf6"></div></div><span class="progress-val">40%</span></div>
-            <p style="font-size:0.72rem;color:var(--t-cla);margin-top:0.5rem;">* Basado en los objetivos de tu plan actual</p>
+          <div class="card-body" id="planContent">
+            <p style="color:var(--t-cla);font-size:0.83rem;">Cargando tu
+              plan...</p>
           </div>
         </div>
       </div>
-      <div>
-        <div class="card" style="margin-bottom:1.2rem;">
-          <div class="card-header"><span class="card-title">Próxima cita</span></div>
-          <div class="card-body" id="proximaCitaInfo">
-            <p style="color:var(--t-cla);font-size:0.83rem;text-align:center;">Cargando...</p>
+
+      <!-- ===== CITAS ===== -->
+      <div id="view-citas" class="content-view">
+        <div
+          style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.2rem;">
+          <div>
+            <div class="section-title-lg">Mis Citas</div>
+            <div class="section-sub">Solo puedes agendar o cancelar citas. Una
+              cita activa por semana máximo.</div>
+          </div>
+          <button class="btn-p" onclick="openModal('modalNuevaCita')">+ Agendar
+            cita</button>
+        </div>
+        <div id="citasList">
+          <p style="color:var(--t-cla);font-size:0.83rem;">Cargando tus
+            citas...</p>
+        </div>
+        <div class="alert-inline alert-warn" style="margin-top:1rem;">
+          ⚠️ Para cancelar con menos de 48 horas de anticipación, contacta
+          directamente a tu nutriólogo.
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EXPEDIENTE ===== -->
+    <div id="view-expediente" class="content-view">
+      <div style="margin-bottom:1.2rem;">
+        <div class="section-title-lg">Mi Expediente</div>
+        <div class="section-sub">
+          Consulta la información registrada por tu nutriólogo.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          Información del expediente
+        </div>
+
+        <div id="expedienteContent" class="card-body">
+          <p style="color:var(--t-cla);font-size:0.83rem;">
+            Cargando expediente...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODALES ===== -->
+
+    <!-- Agendar Cita -->
+    <div class="modal-overlay" id="modalNuevaCita">
+      <div class="modal">
+        <div class="modal-header"><h3>Agendar nueva cita</h3><button
+            class="modal-close"
+            onclick="closeModal('modalNuevaCita')">✕</button></div>
+        <div class="modal-body">
+          <div class="alert-inline" id="alertCitaPaciente"
+            style="display:none;"></div>
+          <div class="schedule-grid">
+            <div>
+              <p
+                style="font-size:0.72rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:var(--t-med);margin-bottom:0.45rem;">Selecciona
+                fecha</p>
+              <div class="mini-cal-hdr">
+                <span id="miniCalTitle"></span>
+                <div><button onclick="changeMinCal(-1)">‹</button><button
+                    onclick="changeMinCal(1)"
+                    style="margin-left:2px">›</button></div>
+              </div>
+              <div class="mini-cal-grid" id="miniCalGrid"></div>
+            </div>
+            <div>
+              <p
+                style="font-size:0.72rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:var(--t-med);margin-bottom:0.45rem;">Horario
+                disponible</p>
+              <div class="time-picker" id="timePicker"><p
+                  style="font-size:0.78rem;color:var(--t-cla);">Selecciona una
+                  fecha primero</p></div>
+            </div>
+          </div>
+          <div class="fg" style="margin-top:1rem;">
+            <label>Motivo de consulta *</label>
+            <select id="citaMotivo">
+              <option value>Seleccionar...</option>
+              <option>Primera consulta</option>
+              <option>Seguimiento nutricional</option>
+              <option>Ajuste de plan alimenticio</option>
+              <option>Revisión de resultados</option>
+              <option>Otro</option>
+            </select>
           </div>
         </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">Acciones rápidas</span></div>
-          <div class="card-body">
-            <button class="quick-action" onclick="showView('citas', null); setTimeout(()=>openModal('modalNuevaCita'),100)">📅 Agendar nueva cita</button>
-            <button class="quick-action" onclick="showView('plan', document.querySelector('.nav-link:nth-child(2)'))">📄 Ver mi plan alimenticio</button>
-            <button class="quick-action"onclick="showView('expediente', document.querySelectorAll('.nav-link')[3]);cargarExpediente();">📄 Ver expediente</button>
+        <div class="modal-footer">
+          <button class="btn-s"
+            onclick="closeModal('modalNuevaCita')">Cancelar</button>
+          <button class="btn-p" onclick="guardarCita()">Confirmar cita</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancelar Cita -->
+    <div class="modal-overlay" id="modalCancelar">
+      <div class="modal" style="max-width:420px;">
+        <div class="modal-header"><h3>Cancelar cita</h3><button
+            class="modal-close"
+            onclick="closeModal('modalCancelar')">✕</button></div>
+        <div class="modal-body">
+          <input type="hidden" id="cancelCitaId">
+          <div class="alert-inline alert-warn" id="cancelWarning"
+            style="display:none;">
+            ⚠️ Esta cita está dentro de las próximas 48 horas. Deberás contactar
+            directamente a tu nutriólogo para cancelarla.
           </div>
+          <div class="fg"><label>Motivo de cancelación
+              (opcional)</label><textarea
+              placeholder="¿Por qué necesitas cancelar?"></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-s"
+            onclick="closeModal('modalCancelar')">Cerrar</button>
+          <button class="btn-p" id="btnConfirmCancel"
+            onclick="confirmarCancelacion()">Cancelar cita</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ===== PLAN ALIMENTICIO ===== -->
-  <div id="view-plan" class="content-view">
-    <div class="section-title-lg">Mi Plan Alimenticio</div>
-    <div class="section-sub">Diseñado por tu nutriólogo · Solo lectura</div>
-    <div class="card">
-      <div class="card-body" id="planContent">
-        <p style="color:var(--t-cla);font-size:0.83rem;">Cargando tu plan...</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== CITAS ===== -->
-  <div id="view-citas" class="content-view">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.2rem;">
-      <div>
-        <div class="section-title-lg">Mis Citas</div>
-        <div class="section-sub">Solo puedes agendar o cancelar citas. Una cita activa por semana máximo.</div>
-      </div>
-      <button class="btn-p" onclick="openModal('modalNuevaCita')">+ Agendar cita</button>
-    </div>
-    <div id="citasList">
-      <p style="color:var(--t-cla);font-size:0.83rem;">Cargando tus citas...</p>
-    </div>
-    <div class="alert-inline alert-warn" style="margin-top:1rem;">
-      ⚠️ Para cancelar con menos de 48 horas de anticipación, contacta directamente a tu nutriólogo.
-    </div>
-  </div>
-</div>
-
-<!-- ===== EXPEDIENTE ===== -->
-<div id="view-expediente" class="content-view">
-  
-  <div style="margin-bottom:1.2rem;">
-    <div class="section-title-lg">Mi Expediente</div>
-    <div class="section-sub">
-      Consulta la información registrada por tu nutriólogo.
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header">
-      Información del expediente
-    </div>
-
-    <div id="expedienteContent" class="card-body">
-      <p style="color:var(--t-cla);font-size:0.83rem;">
-        Cargando expediente...
-      </p>
-    </div>
-  </div>
-
-</div>
-
-
-
-
-<!-- ===== MODALES ===== -->
-
-<!-- Agendar Cita -->
-<div class="modal-overlay" id="modalNuevaCita">
-  <div class="modal">
-    <div class="modal-header"><h3>Agendar nueva cita</h3><button class="modal-close" onclick="closeModal('modalNuevaCita')">✕</button></div>
-    <div class="modal-body">
-      <div class="alert-inline" id="alertCitaPaciente" style="display:none;"></div>
-      <div class="schedule-grid">
-        <div>
-          <p style="font-size:0.72rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:var(--t-med);margin-bottom:0.45rem;">Selecciona fecha</p>
-          <div class="mini-cal-hdr">
-            <span id="miniCalTitle"></span>
-            <div><button onclick="changeMinCal(-1)">‹</button><button onclick="changeMinCal(1)" style="margin-left:2px">›</button></div>
-          </div>
-          <div class="mini-cal-grid" id="miniCalGrid"></div>
+    <!-- MODAL NOTIFICACIONES -->
+    <div id="modalNotificaciones" class="modal-notificaciones hidden">
+      <div class="modal-notificaciones-content">
+        <div class="modal-header">
+          <h2>Notificaciones</h2>
+          <button id="cerrarNotificaciones" type="button">✕</button>
         </div>
-        <div>
-          <p style="font-size:0.72rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:var(--t-med);margin-bottom:0.45rem;">Horario disponible</p>
-          <div class="time-picker" id="timePicker"><p style="font-size:0.78rem;color:var(--t-cla);">Selecciona una fecha primero</p></div>
+        <div id="contenedorNotificaciones">
+          <p class="notificacion-vacia">Cargando...</p>
         </div>
       </div>
-      <div class="fg" style="margin-top:1rem;">
-        <label>Motivo de consulta *</label>
-        <select id="citaMotivo">
-          <option value="">Seleccionar...</option>
-          <option>Primera consulta</option>
-          <option>Seguimiento nutricional</option>
-          <option>Ajuste de plan alimenticio</option>
-          <option>Revisión de resultados</option>
-          <option>Otro</option>
-        </select>
-      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-s" onclick="closeModal('modalNuevaCita')">Cancelar</button>
-      <button class="btn-p" onclick="guardarCita()">Confirmar cita</button>
-    </div>
-  </div>
-</div>
 
-<!-- Cancelar Cita -->
-<div class="modal-overlay" id="modalCancelar">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header"><h3>Cancelar cita</h3><button class="modal-close" onclick="closeModal('modalCancelar')">✕</button></div>
-    <div class="modal-body">
-      <input type="hidden" id="cancelCitaId">
-      <div class="alert-inline alert-warn" id="cancelWarning" style="display:none;">
-        ⚠️ Esta cita está dentro de las próximas 48 horas. Deberás contactar directamente a tu nutriólogo para cancelarla.
-      </div>
-      <div class="fg"><label>Motivo de cancelación (opcional)</label><textarea placeholder="¿Por qué necesitas cancelar?"></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-s" onclick="closeModal('modalCancelar')">Cerrar</button>
-      <button class="btn-p" id="btnConfirmCancel" onclick="confirmarCancelacion()">Cancelar cita</button>
-    </div>
-  </div>
-</div>
+    <script
+      src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/paciente.js') }}"></script>
 
-<!-- ✅ CORRECCIÓN: ruta del JS arreglada (se eliminó el ../) -->
-<script src="{{ url_for('static', filename='js/paciente.js') }}"></script>
-<script>
-// Cargar datos del héro al iniciar
+    <script>
 document.addEventListener('DOMContentLoaded', () => {
   fetch('/api/mi-perfil')
     .then(r => r.json())
     .then(d => {
-      if (d.peso)   document.getElementById('statPeso').textContent  = d.peso + ' kg';
-      if (d.imc)    document.getElementById('statIMC').textContent   = parseFloat(d.imc).toFixed(1);
-      if (d.plan)   document.getElementById('statPlan').textContent  = d.plan;
+      if (d.peso) document.getElementById('statPeso').textContent = d.peso + ' kg';
+      if (d.imc) document.getElementById('statIMC').textContent = parseFloat(d.imc).toFixed(1);
+      if (d.plan) document.getElementById('statPlan').textContent = d.plan;
     }).catch(()=>{});
+
   fetch('/api/mis-citas?proxima=true')
     .then(r => r.json())
     .then(d => {
       if (d.cita) {
-        const [fy,fm,fd] = d.cita.fecha_cita.split("-").map(Number); const f = new Date(fy, fm-1, fd);
+        const [fy,fm,fd] = d.cita.fecha_cita.split("-").map(Number);
+        const f = new Date(fy, fm-1, fd);
         const m = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
         document.getElementById('statCitas').textContent = `${f.getDate()} ${m[f.getMonth()]}`;
       } else {
@@ -235,9 +320,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }).catch(()=>{});
 });
 </script>
-</body>
-
-    <!-- ===== Cargar scrip para mostrar expediente a paciente ===== -->
-    <script src="{{ url_for('static', filename='js/paciente.js') }}"></script>
-
+  </body>
 </html>
