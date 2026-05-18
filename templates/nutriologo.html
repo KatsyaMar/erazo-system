@@ -149,17 +149,21 @@
 
     <!-- ======= PLANES ALIMENTICIOS ======= -->
     <div id="sec-planes" class="content-section">
-      <div class="search-bar-wrap">
-        <div class="search-bar">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" placeholder="Buscar paciente...">
-        </div>
-      </div>
       <div class="plan-split" style="align-items:start;">
         <div class="card">
-          <div class="card-header"><span class="card-title">Pacientes con expediente</span></div>
-          <div id="planPacientesList"><div class="empty-state"><p>Cargando...</p></div></div>
+        <div class="card-header"><span class="card-title">Consultar Paciente</span></div>
+        <div class="card-body">
+          <p style="font-size:0.83rem; color:var(--t-cla); margin-bottom: 1rem;">Ingresa los datos del paciente para asignar, consultar o eliminar su plan.</p>
+          <div class="form-group">
+            <label>Nombre de Usuario o Correo electrónico *</label>
+            <input type="text" id="inputBuscarPlan" placeholder="Ej. erazo@gmail.com">
+          </div>
+          <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="buscarPacientePlan()">
+            Buscar
+          </button>
+          <div class="inline-alert" id="alertBuscarPlan" style="margin-top: 15px;"></div>
         </div>
+      </div>
         <div class="card">
           <div class="card-header">
             <span class="card-title" id="planPacienteNombre">Selecciona un paciente</span>

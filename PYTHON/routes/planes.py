@@ -148,3 +148,38 @@ def mi_plan_api():
         if 'conexion' in locals() and conexion.is_connected():
             cursor.close()
             conexion.close()
+
+# -------------------------------------------------------------------
+# 4. RUTA PARA EL NUTRIÓLOGO: Eliminar el plan alimenticio
+# -------------------------------------------------------------------
+@planes_bp.route('/api/planes/<int:id_usuario>', methods=['DELETE'])
+def eliminar_plan_api(id_usuario):
+    try:
+        conexion = get_db_connection()
+        cursor = conexion.cursor(dictionary=True)
+        
+        # Traducir id_usuario a id_paciente
+        cursor.execute("SELECT id_paciente FROM pacientes WHERE id_usuario = %s", (id_usuario,))
+        paciente = cursor.fetchone()
+        
+        if not paciente:
+            return jsonify({"error": "Paciente no encontrado"}), 404
+
+        id_real = paciente['id_paciente']
+        
+        # Eliminar el registro de la base de datos
+        cursor.execute("DELETE FROM planes_alimenticios WHERE id_paciente = %s", (id_real,))
+        conexion.commit()
+        
+        # (Opcional) Si el registro se borró, respondemos éxito
+        if cursor.rowcount > 0:
+            return jsonify({"success": True, "message": "Plan alimenticio eliminado correctamente."})
+        else:
+            return jsonify({"error": "El plan alimenticio no se encuentra registrado."}), 404
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if 'conexion' in locals() and conexion.is_connected():
+            cursor.close()
+            conexion.close()
