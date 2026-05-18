@@ -31,7 +31,27 @@ function showSection(key, btn) {
 /* ===== MODALES ===== */
 function openModal(id) {
   document.getElementById(id).classList.add('show');
+
+  // Al abrir el modal de nueva cita, establecer la fecha de creación automáticamente
+  if (id === 'modalNuevaCita') {
+    const now = new Date();
+    const formatted = now.toLocaleString('es-MX', {
+      day:    '2-digit',
+      month:  '2-digit',
+      year:   'numeric',
+      hour:   '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+    const elFecha = document.getElementById('citaFechaCreacion');
+    if (elFecha) elFecha.value = formatted;
+
+    // Limpiar nombre al abrir (en caso de que quede de una sesión anterior)
+    const elNombre = document.getElementById('citaNombrePaciente');
+    if (elNombre) elNombre.value = '';
+  }
 }
+
 function closeModal(id) {
   document.getElementById(id).classList.remove('show');
   document.querySelectorAll(`#${id} .inline-alert`).forEach(a => {
@@ -40,7 +60,16 @@ function closeModal(id) {
   });
   const imc = document.getElementById('imcDisplay');
   if (imc) imc.textContent = '—';
+
+  // Limpiar campos informativos del modal de nueva cita al cerrar
+  if (id === 'modalNuevaCita') {
+    const elNombre = document.getElementById('citaNombrePaciente');
+    if (elNombre) elNombre.value = '';
+    const elFecha = document.getElementById('citaFechaCreacion');
+    if (elFecha) elFecha.value = '';
+  }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
@@ -267,16 +296,6 @@ function guardarModificacion() {
 }
 
 /* ===== EXPEDIENTES ===== */
-let filtroExpTexto = '';
-function filterExpedientes(val) {
-  filtroExpTexto = val.toLowerCase().trim();
-  const items = document.querySelectorAll('#expPacientesList .patient-list-item');
-  items.forEach(item => {
-    const texto = item.textContent.toLowerCase();
-    item.style.display = texto.includes(filtroExpTexto) ? '' : 'none';
-  });
-}
-
 function loadExpedientesList() {
   fetch('/api/pacientes?estado=activo&con_expediente=true')
     .then(r => r.json())
@@ -391,16 +410,6 @@ function eliminarExpediente(idExp) {
 }
 
 /* ===== PLANES PDF ===== */
-let filtroPlanTexto = '';
-function filterPlanes(val) {
-  filtroPlanTexto = val.toLowerCase().trim();
-  const items = document.querySelectorAll('#planPacientesList .patient-list-item');
-  items.forEach(item => {
-    const texto = item.textContent.toLowerCase();
-    item.style.display = texto.includes(filtroPlanTexto) ? '' : 'none';
-  });
-}
-
 function loadPlanesList() {
   fetch('/api/pacientes?estado=activo&con_expediente=true')
     .then(r => r.json())
@@ -490,6 +499,47 @@ function uploadPlanPDF(file) {
       }
     })
     .catch(() => showToast('Error al subir el plan', 'error'));
+}
+
+/* ===== CITAS — AUTOCOMPLETAR NOMBRE ===== */
+// Debounce para no disparar fetch en cada tecla
+let _autocompletarTimer = null;
+function autocompletarNombreCita(val) {
+  const elNombre = document.getElementById('citaNombrePaciente');
+  if (!elNombre) return;
+
+  clearTimeout(_autocompletarTimer);
+  const tel = val.trim();
+
+  if (!tel) {
+    elNombre.value = '';
+    return;
+  }
+
+  // Esperar 400ms después de que el usuario deje de escribir
+  _autocompletarTimer = setTimeout(() => {
+    fetch(`/api/pacientes?estado=activo&q=${encodeURIComponent(tel)}`)
+      .then(r => r.json())
+      .then(data => {
+        // Buscar coincidencia exacta por teléfono
+        const match = data.find(p => p.telefono === tel);
+        if (match) {
+          elNombre.value = match.nombre_completo;
+          elNombre.style.color = 'var(--t-osc, #1a2a2a)';
+        } else if (data.length > 0) {
+          // Si no hay exacta pero hay resultados parciales, mostrar el primero
+          elNombre.value = data[0].nombre_completo;
+          elNombre.style.color = 'var(--t-cla, #6b7280)';
+        } else {
+          elNombre.value = 'Paciente no encontrado';
+          elNombre.style.color = 'var(--rojo, #e53e3e)';
+        }
+      })
+      .catch(() => {
+        elNombre.value = 'Error al buscar paciente';
+        elNombre.style.color = 'var(--rojo, #e53e3e)';
+      });
+  }, 400);
 }
 
 /* ===== CITAS — BUSCADOR AGENDA ===== */
@@ -593,16 +643,24 @@ function renderAgenda(day, y, m) {
 
 /* ===== GUARDAR NUEVA CITA ===== */
 function guardarCita() {
-  const tel          = document.getElementById('citaTel').value.trim();
-  const fecha        = document.getElementById('citaFecha').value;
-  const hora         = document.getElementById('citaHora').value;
-  const motivo       = document.getElementById('citaMotivo').value.trim();
-  const observaciones= document.getElementById('citaObservaciones')?.value.trim() || '';
-  const alertEl      = document.getElementById('alertCita');
+  const tel           = document.getElementById('citaTel').value.trim();
+  const fecha         = document.getElementById('citaFecha').value;
+  const hora          = document.getElementById('citaHora').value;
+  const motivo        = document.getElementById('citaMotivo').value.trim();
+  const observaciones = document.getElementById('citaObservaciones')?.value.trim() || '';
+  const alertEl       = document.getElementById('alertCita');
 
   if (!tel || !fecha || !hora || !motivo) {
     alertEl.className = 'inline-alert error show';
     alertEl.textContent = 'Todos los campos obligatorios deben completarse.';
+    return;
+  }
+
+  // Validar que el nombre se haya autocompletado (paciente existe)
+  const nombreEl = document.getElementById('citaNombrePaciente');
+  if (nombreEl && (nombreEl.value === 'Paciente no encontrado' || nombreEl.value === 'Error al buscar paciente')) {
+    alertEl.className = 'inline-alert error show';
+    alertEl.textContent = 'El teléfono ingresado no corresponde a un paciente registrado.';
     return;
   }
 
@@ -658,105 +716,3 @@ function showToast(msg, type = 'success') {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
-// ═══════════════════════════════════════════════════════
-// NOTIFICACIONES
-// ═══════════════════════════════════════════════════════
-(function () {
-  const POLL_INTERVAL = 30000; // 30 seg
-
-  function toggleNotifDropdown() {
-    const dd = document.getElementById('notifDropdown');
-    if (!dd) return;
-    const isOpen = dd.classList.toggle('open');
-    if (isOpen) cargarNotificaciones();
-  }
-
-  async function cargarNotificaciones() {
-    const list  = document.getElementById('notifList');
-    const badge = document.getElementById('notifBadge');
-    try {
-      const res  = await fetch('/api/notificaciones');
-      const data = await res.json();
-      const { notificaciones, no_leidas } = data;
-
-      // Badge
-      if (no_leidas > 0) {
-        badge.textContent = no_leidas > 9 ? '9+' : no_leidas;
-        badge.classList.add('visible');
-      } else {
-        badge.textContent = '';
-        badge.classList.remove('visible');
-      }
-
-      // Lista
-      if (!notificaciones || notificaciones.length === 0) {
-        list.innerHTML = '<div class="notif-empty">Sin notificaciones</div>';
-        return;
-      }
-      list.innerHTML = notificaciones.map(n => `
-        <div class="notif-item ${n.leida ? 'leida' : 'no-leida'}"
-             onclick="marcarUnaLeida(${n.id_notificacion}, this)">
-          <div class="notif-indicador"></div>
-          <div style="flex:1">
-            <div class="notif-texto">${n.mensaje}</div>
-            <div class="notif-fecha">${n.fecha_envio}</div>
-          </div>
-        </div>`).join('');
-    } catch (e) {
-      if (list) list.innerHTML = '<div class="notif-empty">Error al cargar</div>';
-    }
-  }
-
-  async function marcarTodasLeidas() {
-    await fetch('/api/notificaciones/leer', { method: 'PUT' });
-    cargarNotificaciones();
-  }
-
-  async function marcarUnaLeida(id, el) {
-    if (el.classList.contains('leida')) return;
-    await fetch(`/api/notificaciones/${id}/leer`, { method: 'PUT' });
-    el.classList.remove('no-leida');
-    el.classList.add('leida');
-    el.querySelector('.notif-indicador').style.background = 'transparent';
-    el.querySelector('.notif-indicador').style.border = '1px solid #ccc';
-    // Actualizar badge
-    const badge = document.getElementById('notifBadge');
-    const curr  = parseInt(badge.textContent) || 0;
-    const next  = curr - 1;
-    if (next <= 0) { badge.textContent = ''; badge.classList.remove('visible'); }
-    else { badge.textContent = next > 9 ? '9+' : next; }
-  }
-
-  // Cerrar al click fuera
-  document.addEventListener('click', function (e) {
-    const wrapper = document.getElementById('notifWrapper');
-    const dd      = document.getElementById('notifDropdown');
-    if (wrapper && dd && !wrapper.contains(e.target)) {
-      dd.classList.remove('open');
-    }
-  });
-
-  // Exponer globals para onclick en HTML
-  window.toggleNotifDropdown = toggleNotifDropdown;
-  window.marcarTodasLeidas   = marcarTodasLeidas;
-  window.marcarUnaLeida      = marcarUnaLeida;
-
-  // Polling automático para el badge
-  function pollBadge() {
-    fetch('/api/notificaciones')
-      .then(r => r.json())
-      .then(data => {
-        const badge = document.getElementById('notifBadge');
-        if (!badge) return;
-        const n = data.no_leidas || 0;
-        if (n > 0) { badge.textContent = n > 9 ? '9+' : n; badge.classList.add('visible'); }
-        else        { badge.textContent = ''; badge.classList.remove('visible'); }
-      }).catch(() => {});
-  }
-
-  // Cargar badge al iniciar y cada 30 seg
-  document.addEventListener('DOMContentLoaded', () => {
-    pollBadge();
-    setInterval(pollBadge, POLL_INTERVAL);
-  });
-})();

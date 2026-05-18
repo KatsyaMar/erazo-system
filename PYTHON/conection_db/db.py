@@ -11,7 +11,7 @@ def get_db_connection():
             host=os.getenv('DB_HOST', 'localhost'),
             port=int(os.getenv('DB_PORT', 3306)),
             user=os.getenv('DB_USER', 'root'),
-            password=os.getenv('DB_PASSWORD', ''),
+            password=os.getenv('DB_PASSWORD', 'wendolin'),
             database=os.getenv('DB_NAME', 'erazo_system')
         )
         if connection.is_connected():
@@ -23,4 +23,3 @@ def get_db_connection():
 def close_db_connection(connection):
     if connection and connection.is_connected():
         connection.close()
-        

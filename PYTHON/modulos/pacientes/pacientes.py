@@ -3,6 +3,7 @@ from datetime  import datetime, date
 from flask     import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from flask_bcrypt import generate_password_hash
+from PYTHON.modulos.notificaciones import enviar_notificacion_correo
 
 from PYTHON.conection_db.db import get_db_connection
 
