@@ -50,6 +50,20 @@ function openModal(id) {
     const elNombre = document.getElementById('citaNombrePaciente');
     if (elNombre) elNombre.value = '';
   }
+
+    // Modal para fechas de modificacion
+    if (id === 'modalAsignarExp') {
+    const fecha = new Date().toLocaleString('es-MX');
+
+    document.getElementById('expFechaCreacion').value = fecha;
+    document.getElementById('expFechaModificacion').value = '';
+  }
+
+  if (id === 'modalModificarExp') {
+    const fecha = new Date().toLocaleString('es-MX');
+
+    document.getElementById('modExpFechaModificacion').value = fecha;
+  }
 }
 
 function closeModal(id) {
@@ -338,7 +352,7 @@ function showExpDetail(idUsuario, el) {
         ${exp.nuevas_observaciones ? `<div class="exp-field"><label>Nuevas Observaciones</label><p>${exp.nuevas_observaciones}</p></div>` : ''}
         <div style="display:flex;gap:0.5rem;margin-top:1rem;">
           <button class="btn-primary" style="font-size:0.78rem" onclick="modificarExpediente(${idUsuario})">Modificar</button>
-          <button class="btn-danger" onclick="eliminarExpediente(${exp.id_expediente})">Eliminar</button>
+          
         </div>`;
     })
     .catch(() => showToast('Error al cargar expediente', 'error'));
@@ -346,54 +360,105 @@ function showExpDetail(idUsuario, el) {
 
 function guardarExpediente() {
   const alertEl = document.getElementById('alertExp');
-  const tel  = document.getElementById('expTelefono').value.trim();
-  const obj  = document.getElementById('expObjetivo').value.trim();
+
+  const nombreUsuario = document.getElementById('expNombreUsuario').value.trim();
+  const correo = document.getElementById('expCorreo').value.trim();
+  const obj = document.getElementById('expObjetivo').value.trim();
   const diag = document.getElementById('expDiag').value.trim();
-  const obs  = document.getElementById('expObs').value.trim();
+  const obs = document.getElementById('expObs').value.trim();
   const hist = document.getElementById('expHistorial').value.trim();
-  if (!tel || !obj || !diag || !obs || !hist) {
+  const nuevasObs = document.getElementById('expNuevasObs').value.trim();
+  const fechaCreacion = document.getElementById('expFechaCreacion').value;
+  const fechaModificacion = document.getElementById('expFechaModificacion').value;
+
+  if (!correo || !obj || !diag || !obs || !hist || !fechaCreacion) {
     alertEl.className = 'inline-alert error show';
-    alertEl.textContent = 'Todos los datos son obligatorios.';
+    alertEl.textContent = 'Todos los datos son obligatorios, favor de rellenarlos';
     return;
   }
+
   fetch('/api/expedientes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ telefono: tel, objetivo_nutricional: obj, diagnostico_inicial: diag, observaciones_medicas: obs, historial_clinico: hist })
+    body: JSON.stringify({
+      nombre_usuario: nombreUsuario,
+      correo: correo,
+      objetivo_nutricional: obj,
+      diagnostico_inicial: diag,
+      observaciones_medicas: obs,
+      historial_clinico: hist,
+      nuevas_observaciones: nuevasObs,
+      fecha_creacion: fechaCreacion,
+      fecha_modificacion: fechaModificacion
+    })
   })
-    .then(r => r.json())
-    .then(data => {
-      if (data.error) { alertEl.className = 'inline-alert error show'; alertEl.textContent = data.error; }
-      else { closeModal('modalAsignarExp'); loadExpedientesList(); showToast('Expediente creado correctamente'); }
-    });
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) {
+      alertEl.className = 'inline-alert error show';
+      alertEl.textContent = data.error;
+    } else {
+      closeModal('modalAsignarExp');
+      loadExpedientesList();
+      showToast('Expediente creado correctamente');
+    }
+  });
+}
+
+function calcIMCExpediente() {
+  const peso = parseFloat(document.getElementById('modExpPeso').value);
+  const estatura = parseFloat(document.getElementById('modExpEstatura').value);
+  const imcDisplay = document.getElementById('modExpIMC');
+
+  if (peso > 0 && estatura > 0) {
+    const imc = (peso / (estatura * estatura)).toFixed(1);
+    imcDisplay.textContent = imc;
+  } else {
+    imcDisplay.textContent = '—';
+  }
 }
 
 function modificarExpediente(idExpediente) {
   document.getElementById('modExpUsuarioId').value = idExpediente;
   openModal('modalModificarExp');
 }
+
+
 function guardarModificacionExp() {
-  const idU  = document.getElementById('modExpUsuarioId').value;
-  const obs  = document.getElementById('modExpObs').value.trim();
+  const idU = document.getElementById('modExpUsuarioId').value;
+
+  const obs = document.getElementById('modExpObs').value.trim();
   const peso = document.getElementById('modExpPeso').value;
-  const est  = document.getElementById('modExpEstatura').value;
-  const obj  = document.getElementById('modExpObjetivo').value.trim();
-  if (!obs && !peso && !est && !obj) {
-    const al = document.getElementById('alertModExp');
-    al.className = 'inline-alert error show'; al.textContent = 'Ingresa al menos un campo a modificar.';
-    return;
-  }
+  const est = document.getElementById('modExpEstatura').value;
+  const obj = document.getElementById('modExpObjetivo').value.trim();
+  const fechaModificacion = document.getElementById('modExpFechaModificacion').value;
+
   fetch(`/api/expedientes/${idU}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nuevas_observaciones: obs, peso: peso ? parseFloat(peso) : null, estatura: est ? parseFloat(est) : null, objetivo_nutricional: obj || null })
+    body: JSON.stringify({
+      nuevas_observaciones: obs,
+      peso: peso ? parseFloat(peso) : null,
+      estatura: est ? parseFloat(est) : null,
+      objetivo_nutricional: obj || null,
+      fecha_modificacion: fechaModificacion
+    })
   })
-    .then(r => r.json())
-    .then(data => {
-      if (data.error) { const al = document.getElementById('alertModExp'); al.className='inline-alert error show'; al.textContent=data.error; }
-      else { closeModal('modalModificarExp'); loadExpedientesList(); showToast('Expediente actualizado correctamente'); }
-    });
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) {
+      const al = document.getElementById('alertModExp');
+      al.className = 'inline-alert error show';
+      al.textContent = data.error;
+    } else {
+      closeModal('modalModificarExp');
+      loadExpedientesList();
+      showToast('Expediente actualizado correctamente');
+    }
+  });
 }
+
+
 function eliminarExpediente(idExp) {
   if (!confirm('¿Eliminar este expediente? Esta acción no se puede deshacer.')) return;
   fetch(`/api/expedientes/${idExp}`, { method: 'DELETE' })
@@ -408,6 +473,135 @@ function eliminarExpediente(idExp) {
       }
     });
 }
+
+
+function eliminarExpedientePorDato() {
+  const dato = document.getElementById('deleteExpDatoGeneral').value.trim();
+  const alerta = document.getElementById('alertEliminarExpPorDato');
+
+  if (!dato) {
+    alerta.className = 'inline-alert error show';
+    alerta.textContent = 'Debe ingresar teléfono o correo electrónico';
+    return;
+  }
+
+  fetch('/api/expedientes/eliminar-por-dato', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      dato: dato
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) {
+      alerta.className = 'inline-alert error show';
+      alerta.textContent = data.error;
+    } else {
+      closeModal('modalEliminarExpPorDato');
+
+      document.getElementById('deleteExpDatoGeneral').value = '';
+
+      loadExpedientesList();
+
+      document.getElementById('expDetailTitle').textContent = 'Selecciona un paciente';
+      document.getElementById('expDetailBody').innerHTML = `
+        <div class="empty-state">
+          <p>Selecciona un paciente para ver su expediente</p>
+        </div>
+      `;
+
+      showToast('Expediente eliminado correctamente');
+    }
+  });
+}
+
+
+function consultarExpedientePorDato() {
+  const dato = document.getElementById('consultarExpDato').value.trim();
+  const alerta = document.getElementById('alertConsultarExpPorDato');
+
+  if (!dato) {
+    alerta.className = 'inline-alert error show';
+    alerta.textContent = 'Debe ingresar teléfono o correo electrónico';
+    return;
+  }
+
+  fetch(`/api/expedientes/consultar-por-dato?dato=${encodeURIComponent(dato)}`)
+    .then(r => r.json())
+    .then(exp => {
+      if (exp.error) {
+        alerta.className = 'inline-alert error show';
+        alerta.textContent = exp.error;
+        return;
+      }
+
+      document.querySelectorAll('.patient-list-item').forEach(x => {
+        x.classList.remove('selected');
+      });
+
+      closeModal('modalConsultarExpPorDato');
+
+      document.getElementById('consultarExpDato').value = '';
+
+      document.getElementById('expDetailTitle').textContent =
+        `Expediente – ${exp.nombre_completo}`;
+
+      document.getElementById('expDetailBody').innerHTML = `
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="val">${exp.peso}kg</div>
+            <div class="lbl">Peso</div>
+          </div>
+
+          <div class="metric-box">
+            <div class="val">${exp.estatura}m</div>
+            <div class="lbl">Estatura</div>
+          </div>
+
+          <div class="metric-box">
+            <div class="val">${parseFloat(exp.imc).toFixed(1)}</div>
+            <div class="lbl">IMC</div>
+          </div>
+        </div>
+
+        <div class="exp-field">
+          <label>Objetivo Nutricional</label>
+          <p>${exp.objetivo_nutricional}</p>
+        </div>
+
+        <div class="exp-field">
+          <label>Diagnóstico Inicial</label>
+          <p>${exp.diagnostico_inicial}</p>
+        </div>
+
+        <div class="exp-field">
+          <label>Observaciones Médicas</label>
+          <p>${exp.observaciones_medicas}</p>
+        </div>
+
+        <div class="exp-field">
+          <label>Historial Clínico</label>
+          <p>${exp.historial_clinico}</p>
+        </div>
+
+        ${exp.nuevas_observaciones ? `
+          <div class="exp-field">
+            <label>Nuevas Observaciones</label>
+            <p>${exp.nuevas_observaciones}</p>
+          </div>
+        ` : ''}
+
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+          <button class="btn-primary" style="font-size:0.78rem" onclick="modificarExpediente(${exp.id_usuario})">
+            Modificar
+          </button>
+        </div>
+      `;
+    })
+    .catch(() => showToast('Error al cargar expediente', 'error'));
+}
+
 
 /* ===== PLANES PDF ===== */
 function loadPlanesList() {

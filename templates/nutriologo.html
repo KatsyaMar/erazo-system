@@ -125,13 +125,38 @@
     <div id="sec-expedientes" class="content-section">
       <div class="search-bar-wrap">
         <div class="search-bar">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" placeholder="Buscar paciente..." oninput="filterExpedientes(this.value)">
+          <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+
+          <input 
+            type="text"
+            placeholder="Buscar paciente..."
+            oninput="filterExpedientes(this.value)">
         </div>
-        <button class="btn-primary" onclick="openModal('modalAsignarExp')">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+
+        <!-- NUEVO BOTÓN ELIMINAR -->
+        <button class="btn-danger" onclick="openModal('modalEliminarExpPorDato')">
+          Eliminar Expediente
+        </button>
+
+        <button class="btn-secondary" onclick="openModal('modalConsultarExpPorDato')">
+          Consultar Expediente
+        </button>
+
+        <button 
+          class="btn-primary"
+          onclick="openModal('modalAsignarExp')">
+          
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+
           Nuevo Expediente
         </button>
+
       </div>
       <div class="two-col-wide" style="align-items:start;">
         <div class="card">
@@ -330,18 +355,66 @@
   </div>
 </div>
 
+
 <!-- Nuevo Expediente -->
 <div class="modal-overlay" id="modalAsignarExp">
   <div class="modal">
-    <div class="modal-header"><h3>Crear expediente clínico</h3><button class="modal-close" onclick="closeModal('modalAsignarExp')">✕</button></div>
+    <div class="modal-header">
+      <h3>Crear expediente clínico</h3>
+      <button class="modal-close" onclick="closeModal('modalAsignarExp')">✕</button>
+    </div>
+
     <div class="modal-body">
       <div class="inline-alert" id="alertExp"></div>
-      <div class="form-group"><label>Teléfono del paciente *</label><input type="text" id="expTelefono" placeholder="Número de teléfono registrado"></div>
-      <div class="form-group"><label>Objetivo nutricional *</label><textarea id="expObjetivo" placeholder="Ej. Pérdida de peso con mantenimiento muscular..."></textarea></div>
-      <div class="form-group"><label>Diagnóstico inicial *</label><textarea id="expDiag" placeholder="Evaluación inicial del estado nutricional..."></textarea></div>
-      <div class="form-group"><label>Observaciones médicas *</label><textarea id="expObs" placeholder="Condiciones médicas, alergias, medicamentos..."></textarea></div>
-      <div class="form-group"><label>Historial clínico *</label><textarea id="expHistorial" placeholder="Antecedentes relevantes del paciente..."></textarea></div>
+
+      <div class="form-group">
+        <label>Nombre de Usuario</label>
+        <input type="text" id="expNombreUsuario" placeholder="Nombre del paciente registrado">
+      </div>
+
+      <div class="form-group">
+        <label>Correo electrónico *</label>
+        <input type="email" id="expCorreo" placeholder="correo@ejemplo.com">
+      </div>
+
+      <div class="form-group">
+        <label>Objetivo nutricional *</label>
+        <textarea id="expObjetivo"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Diagnóstico inicial *</label>
+        <textarea id="expDiag"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Observaciones médicas *</label>
+        <textarea id="expObs"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Historial clínico *</label>
+        <textarea id="expHistorial"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Nuevas observaciones</label>
+        <textarea id="expNuevasObs"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha de creación *</label>
+          <input type="text" id="expFechaCreacion" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de modificación</label>
+          <input type="text" id="expFechaModificacion" readonly>
+        </div>
+      </div>
     </div>
+
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modalAsignarExp')">Cancelar</button>
       <button class="btn-primary" onclick="guardarExpediente()">Crear expediente</button>
@@ -352,17 +425,49 @@
 <!-- Modificar Expediente -->
 <div class="modal-overlay" id="modalModificarExp">
   <div class="modal">
-    <div class="modal-header"><h3>Modificar expediente</h3><button class="modal-close" onclick="closeModal('modalModificarExp')">✕</button></div>
+    <div class="modal-header">
+      <h3>Modificar expediente</h3>
+      <button class="modal-close" onclick="closeModal('modalModificarExp')">✕</button>
+    </div>
+
     <div class="modal-body">
       <div class="inline-alert" id="alertModExp"></div>
+
       <input type="hidden" id="modExpUsuarioId">
+
       <div class="form-row">
-        <div class="form-group"><label>Peso actualizado (kg)</label><input type="number" id="modExpPeso" placeholder="Dejar vacío para no modificar" step="0.1"></div>
-        <div class="form-group"><label>Estatura actualizada (m)</label><input type="number" id="modExpEstatura" placeholder="Dejar vacío para no modificar" step="0.01"></div>
+        <div class="form-group">
+          <label>Peso actualizado</label>
+          <input type="number" id="modExpPeso" step="0.1" oninput="calcIMCExpediente()">
+        </div>
+
+        <div class="form-group">
+          <label>Estatura actualizada</label>
+          <input type="number" id="modExpEstatura" step="0.01" oninput="calcIMCExpediente()">
+        </div>
       </div>
-      <div class="form-group"><label>Objetivo nutricional</label><input type="text" id="modExpObjetivo" placeholder="Dejar vacío para no modificar"></div>
-      <div class="form-group"><label>Nuevas observaciones *</label><textarea id="modExpObs" placeholder="Ingresa al menos las nuevas observaciones..."></textarea></div>
+
+      <div class="form-group">
+        <label>IMC actualizado</label>
+        <div class="imc-display" id="modExpIMC">—</div>
+      </div>
+
+      <div class="form-group">
+        <label>Nuevas observaciones</label>
+        <textarea id="modExpObs"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Cambios en el objetivo nutricional</label>
+        <input type="text" id="modExpObjetivo">
+      </div>
+
+      <div class="form-group">
+        <label>Fecha de modificación *</label>
+        <input type="text" id="modExpFechaModificacion" readonly>
+      </div>
     </div>
+
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modalModificarExp')">Cancelar</button>
       <button class="btn-primary" onclick="guardarModificacionExp()">Guardar cambios</button>
@@ -472,6 +577,63 @@
       <button class="btn-danger" onclick="confirmarCancelacionNut()" style="padding:0.52rem 1rem;">
         Confirmar cancelación
       </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Eliminar Expediente por teléfono o correo -->
+<div class="modal-overlay" id="modalEliminarExpPorDato">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3>Eliminar expediente</h3>
+      <button class="modal-close" onclick="closeModal('modalEliminarExpPorDato')">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="inline-alert" id="alertEliminarExpPorDato"></div>
+
+      <p style="font-size:0.85rem;color:var(--t-med);line-height:1.6;margin-bottom:1rem;">
+        Ingresa el teléfono o correo electrónico del paciente.
+      </p>
+
+      <div class="form-group">
+        <label>Teléfono o correo electrónico *</label>
+        <input type="text" id="deleteExpDatoGeneral" placeholder="Teléfono o correo del paciente">
+      </div>
+
+      <p style="font-size:0.8rem;color:var(--rojo);line-height:1.5;">
+        El sistema no eliminará el expediente si existen citas pendientes o activas.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalEliminarExpPorDato')">Cancelar</button>
+      <button class="btn-danger" onclick="eliminarExpedientePorDato()">Confirmar eliminación</button>
+    </div>
+  </div>
+</div>
+
+<!-- Consultar Expediente por teléfono o correo -->
+<div class="modal-overlay" id="modalConsultarExpPorDato">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3>Consultar expediente</h3>
+      <button class="modal-close" onclick="closeModal('modalConsultarExpPorDato')">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="inline-alert" id="alertConsultarExpPorDato"></div>
+
+      <div class="form-group">
+        <label>Teléfono o correo electrónico *</label>
+        <input type="text" id="consultarExpDato" placeholder="Teléfono o correo del paciente">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalConsultarExpPorDato')">Cancelar</button>
+      <button class="btn-primary" onclick="consultarExpedientePorDato()">Consultar</button>
     </div>
   </div>
 </div>
