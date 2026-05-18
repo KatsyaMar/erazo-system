@@ -604,28 +604,58 @@ function consultarExpedientePorDato() {
 
 
 /* ===== PLANES PDF ===== */
-function loadPlanesList() {
-  fetch('/api/pacientes?estado=activo&con_expediente=true')
+let selectedPlanUserId = null;
+
+/* ===== BÚSQUEDA EXACTA PARA PLANES (ESTRICTO POR DFR) ===== */
+function buscarPacientePlan() {
+  const inputVal = document.getElementById('inputBuscarPlan').value.trim();
+  const alertEl = document.getElementById('alertBuscarPlan');
+
+  // CRITERIO DFR 4.1: "Si falta información obligatoria..."
+  if (!inputVal) {
+    alertEl.className = 'inline-alert error show';
+    alertEl.textContent = 'Datos incompletos, favor de llenar todos los campos.';
+    return;
+  }
+
+  alertEl.classList.remove('show');
+
+  // Buscar en el servidor
+  fetch(`/api/pacientes?estado=activo&con_expediente=true`)
     .then(r => r.json())
     .then(data => {
-      const list = document.getElementById('planPacientesList');
-      if (!list) return;
-      list.innerHTML = data.map(p => {
-        const ini = p.nombre_completo.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase();
-        return `<div class="patient-list-item" onclick="selectPlanPaciente(${p.id_usuario}, '${p.nombre_completo}', this)">
-          <div class="p-avatar">${ini}</div>
-          <div style="flex:1"><div style="font-size:0.83rem;font-weight:500">${p.nombre_completo}</div>
-          <div style="font-size:0.7rem;color:var(--t-cla)">${p.telefono}</div></div>
-        </div>`;
-      }).join('');
-    });
+      // Filtrar coincidencia exacta de nombre o correo
+      const paciente = data.find(p => p.correo.toLowerCase() === inputVal.toLowerCase() || p.nombre_completo.toLowerCase() === inputVal.toLowerCase());
+
+      // CRITERIO DFR 4.1: "Si el paciente no existe..."
+      if (!paciente) {
+        alertEl.className = 'inline-alert error show';
+        alertEl.textContent = 'Paciente no encontrado.';
+        
+        // Bloqueamos el lado derecho
+        document.getElementById('planPacienteNombre').textContent = 'Selecciona un paciente';
+        document.getElementById('planViewPanel').innerHTML = `<div class="pdf-drop-zone" style="cursor:default;pointer-events:none;opacity:0.5;"><p>Selecciona un paciente para cargar o ver su plan</p></div>`;
+        selectedPlanUserId = null;
+        return;
+      }
+
+      // Si sí existe, lo cargamos
+      alertEl.className = 'inline-alert success show';
+      alertEl.textContent = 'Paciente encontrado.';
+      selectPlanPaciente(paciente.id_usuario, paciente.nombre_completo, null);
+    })
+    .catch(() => showToast('Error al conectar con el servidor', 'error'));
 }
 
-let selectedPlanUserId = null;
 function selectPlanPaciente(id, nombre, el) {
   selectedPlanUserId = id;
-  document.querySelectorAll('.patient-list-item').forEach(x => x.classList.remove('selected'));
-  el.classList.add('selected');
+  
+  // Limpiamos selecciones previas si venimos de una lista, si no, lo omitimos
+  if (el) {
+    document.querySelectorAll('.patient-list-item').forEach(x => x.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  
   document.getElementById('planPacienteNombre').textContent = nombre;
   
   fetch(`/api/planes/${id}`)
@@ -639,12 +669,15 @@ function selectPlanPaciente(id, nombre, el) {
               <span class="pdf-name">Plan de ${nombre}</span>
               <div class="pdf-actions">
                 <a href="${plan.pdf_url}" download class="pdf-btn">Descargar</a>
-                <button class="pdf-btn" onclick="triggerPlanUpload()">Reemplazar PDF</button>
+                <button class="act-btn red" style="margin-left:5px;" onclick="eliminarPlan(${id}, '${nombre}')">Eliminar</button>
               </div>
             </div>
             <iframe src="${plan.pdf_url}" title="Plan alimenticio"></iframe>
           </div>`;
       } else {
+        // CRITERIO DFR 4.2: Mostrar mensaje cuando no hay plan
+        showToast('No existe un plan alimenticio asignado para este paciente', 'error');
+
         panel.innerHTML = `
           <div class="pdf-drop-zone" id="dropZone" onclick="triggerPlanUpload()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.6;">
@@ -664,10 +697,8 @@ function selectPlanPaciente(id, nombre, el) {
     });
 }
 
-function triggerPlanUpload() {
-  document.getElementById('planPdfInput').click();
-}
-function handleDragOver(e)  { e.preventDefault(); document.getElementById('dropZone')?.classList.add('dragover'); }
+function triggerPlanUpload() { document.getElementById('planPdfInput').click(); }
+function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone')?.classList.add('dragover'); }
 function handleDragLeave(e) { document.getElementById('dropZone')?.classList.remove('dragover'); }
 function handleDrop(e) {
   e.preventDefault();
@@ -676,9 +707,14 @@ function handleDrop(e) {
   if (file && file.type === 'application/pdf') uploadPlanPDF(file);
   else showToast('Solo se permiten archivos PDF', 'error');
 }
+
 function uploadPlanPDF(file) {
   if (!selectedPlanUserId) return;
-  if (!file || file.type !== 'application/pdf') { showToast('Solo se permiten archivos PDF', 'error'); return; }
+  if (!file || file.type !== 'application/pdf') { 
+    showToast('Solo se permiten archivos PDF', 'error');
+    return; 
+  }
+  
   const form = new FormData();
   form.append('pdf', file);
   form.append('id_usuario', selectedPlanUserId);
@@ -688,11 +724,29 @@ function uploadPlanPDF(file) {
     .then(data => {
       if (data.error) showToast(data.error, 'error');
       else { 
-        showToast('Plan alimenticio subido correctamente'); 
-        selectPlanPaciente(selectedPlanUserId, document.getElementById('planPacienteNombre').textContent, document.querySelector('.patient-list-item.selected')); 
+        // CRITERIO DFR 4.1: Mensaje de éxito
+        showToast('Plan alimenticio asignado correctamente'); 
+        selectPlanPaciente(selectedPlanUserId, document.getElementById('planPacienteNombre').textContent, null); 
       }
     })
     .catch(() => showToast('Error al subir el plan', 'error'));
+}
+
+function eliminarPlan(idUsuario, nombre) {
+  if (!confirm(`¿Estás seguro de que deseas eliminar el plan alimenticio de ${nombre}?`)) return;
+  
+  fetch(`/api/planes/${idUsuario}`, { method: 'DELETE' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) {
+        showToast(data.error, 'error');
+      } else {
+        showToast('Plan alimenticio eliminado correctamente');
+        // Recargar la vista pasando null en lugar del HTML antiguo
+        selectPlanPaciente(idUsuario, nombre, null);
+      }
+    })
+    .catch(() => showToast('Error al eliminar el plan', 'error'));
 }
 
 /* ===== CITAS — AUTOCOMPLETAR NOMBRE ===== */
