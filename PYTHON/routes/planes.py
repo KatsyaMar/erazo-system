@@ -38,7 +38,6 @@ def verificar_plan_api(id_usuario):
         if 'conexion' in locals() and conexion.is_connected():
             cursor.close()
             conexion.close()
-
 # -------------------------------------------------------------------
 # 2. RUTA PARA EL NUTRIÓLOGO: Subir y asignar el plan
 # -------------------------------------------------------------------
@@ -61,14 +60,20 @@ def subir_plan_api():
             conexion = get_db_connection()
             cursor = conexion.cursor(dictionary=True)
 
-            # Traducimos el ID de nuevo para guardar correctamente en la BD
-            cursor.execute("SELECT id_paciente FROM pacientes WHERE id_usuario = %s", (id_usuario_recibido,))
+            # ¡CAMBIO 1! Buscamos al paciente Y su expediente activo al mismo tiempo
+            cursor.execute("""
+                SELECT p.id_paciente, e.id_expediente 
+                FROM pacientes p 
+                JOIN expedientes e ON p.id_paciente = e.id_paciente 
+                WHERE p.id_usuario = %s AND e.estado = 'ACTIVO'
+            """, (id_usuario_recibido,))
             resultado = cursor.fetchone()
 
             if not resultado:
-                return jsonify({"error": "No existe un expediente para este usuario."}), 400
+                return jsonify({"error": "No existe un expediente activo para este usuario."}), 400
             
             id_real_paciente = resultado['id_paciente']
+            id_del_expediente = resultado['id_expediente'] # <--- ¡Atrapamos el expediente!
 
             # Guardamos archivo y generamos ruta web
             archivo.save(ruta_fisica)
@@ -84,10 +89,11 @@ def subir_plan_api():
                     SET nombre_pdf = %s, ruta_pdf = %s WHERE id_paciente = %s
                 """, (nombre_seguro, ruta_web, id_real_paciente))
             else:
+                # ¡CAMBIO 2! Agregamos el id_expediente al INSERT
                 cursor.execute("""
-                    INSERT INTO planes_alimenticios (id_paciente, nombre_pdf, ruta_pdf) 
-                    VALUES (%s, %s, %s)
-                """, (id_real_paciente, nombre_seguro, ruta_web))
+                    INSERT INTO planes_alimenticios (id_paciente, id_expediente, nombre_pdf, ruta_pdf) 
+                    VALUES (%s, %s, %s, %s)
+                """, (id_real_paciente, id_del_expediente, nombre_seguro, ruta_web))
                                
             conexion.commit()
             return jsonify({"success": True})
@@ -100,10 +106,7 @@ def subir_plan_api():
                 conexion.close()
     else:
         return jsonify({"error": "Formato inválido. Solo PDF."}), 400
-
-# -------------------------------------------------------------------
-# 3. RUTA PARA EL PACIENTE: Consultar su propio plan
-# -------------------------------------------------------------------
+        
 # -------------------------------------------------------------------
 # 3. RUTA PARA EL PACIENTE: Consultar su propio plan
 # -------------------------------------------------------------------
